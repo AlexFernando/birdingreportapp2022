@@ -2,8 +2,8 @@
     "name": "REACT_FILE_UPLOAD",
     "version": "1.0.0",
     "engines": {
-        "node": ">=13.9.x",
-        "npm": ">=6.13.x"
+        "node": ">= 18.5.0",
+        "npm": ">= 8.13.2"
     },
     "description": "",
     "main": "index.js",
