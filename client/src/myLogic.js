@@ -82,24 +82,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
         filteredData.map(elem => {
     
-            //To put * in Location 
+            //To no have problems later
             if (!elem.hasOwnProperty('Observation Details')) {
 
-               
-                // elem['Location'] += '';
-                // elem['Location'].trim();
                 elem['Observation Details'] = 'No';
         
             }
-            // } else if (elem['Observation Details'].trim() === 'Heard(s).') {
-            //     elem['Location'] = "*";
-            
-            // else {
-            //     elem['Location'] += '';
-            //     elem['Location'].trim();
-            // }
-    
-            //clean the objects to keep just some keys values
+           
             const allowed = ['Common Name', 'Scientific Name', 'Location', 'Observation Details', 'Date', 'Time'];
     
             const filtered = Object.keys(elem)
@@ -174,15 +163,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         arrLocationsUpdated.map( (element => {
      
-                if(element['Observation Details'].match(subSpecieRegex)){
-     
-                    let sspElem = element['Observation Details'].match(subSpecieRegex);
-                    
-                    arrOfSsp.push(sspElem[0]);
-                    arrOfSspNames.push(element['Common Name']);
-                    arrOfLocationSsp.push(element['Location']);
-                }
-            
+            if(element['Observation Details'].match(subSpecieRegex)){
+    
+                let sspElem = element['Observation Details'].match(subSpecieRegex);
+                
+                arrOfSsp.push(sspElem[0]);
+                arrOfSspNames.push(element['Common Name']);
+                arrOfLocationSsp.push(element['Location']);
+            }
         }))
     
         const setOfSsp = new Set(arrOfSsp);
@@ -196,9 +184,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
             let name = curr['Common Name']
             const found = accumulator.find(elem => elem['Common Name'] === name)
-                
-            if(found && found.Location.includes(curr.Location)) {
-         
+  
+            if(found) {
+                        
                     if( curr['Observation Details'].trim() === 'Heard(s)' || curr['Observation Details'].trim() === 'Heard(s).'){
                         
                         if(found.Location_heard === '') {
@@ -233,6 +221,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
+
                         found.Location += ";" + curr.Location;
                         found.Date += ";" + curr.Date; 
                         found.Time += ";" + curr.Time;
@@ -324,21 +313,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             else {
                 return elem;
             }
-           
-            // PUEDE QUE SIRVA ESTA PARTE 
-            // if (myLocation.length === 1 && myLocation[0] === '*') {
-            //     elem['Scientific Name'] += '*';
-            //     myLocation.unshift('');
-            //     elem['Location'] = myLocation[0];
-            // } else if (myLocation.length > 1 && myLocation.indexOf('*') > -1) {
-            //     let index = myLocation.indexOf('*');
-            //     if (index > -1) {
-            //         myLocation.splice(index, 1);
-            //     }
-            //     elem['Location'] = `Seen at: ${myLocation.join(', ')}.`;
-            // } else {
-            //     elem['Location'] = `Seen at: ${myLocation.join(', ')}.`;
-            // }
+
         })
 
         let locationBothUpdated = locationsHeardUpdated.map( elem => {
@@ -489,7 +464,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 return elem;
             }
         })
-
 
         locationsSeenUpdated.map( elem => {
 
