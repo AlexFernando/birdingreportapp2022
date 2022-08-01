@@ -1,12 +1,10 @@
 {
     "name": "REACT_FILE_UPLOAD",
     "version": "1.0.0",
-
     "engines": {
         "node": "13.9.x",
         "npm": "6.13.x"
     },
-    
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -27,7 +25,8 @@
         "csv-parser": "^2.3.2",
         "downloadjs": "^1.4.7",
         "express": "^4.17.1",
-        "express-fileupload": "^1.1.6"
+        "express-fileupload": "^1.1.6",
+        "officegen": "^0.6.5"
     },
     "devDependencies": {
         "concurrently": "^5.1.0",
