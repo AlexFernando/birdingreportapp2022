@@ -37,7 +37,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
     function filterData(results) {
     
         let count = 0;
-        let myStringOfYears = ''
     
         for (let i in results) {
             let obj = results[i];
@@ -47,7 +46,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             //saving complete objects
             if (date >= date1 && date <= date2) {
                 count++;
-                myStringOfYears += date.toString() + " "
                 filteredData.push(obj);
             }
         }
@@ -222,9 +220,18 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                     else {
 
-                        found.Location += ";" + curr.Location;
-                        found.Date += ";" + curr.Date; 
-                        found.Time += ";" + curr.Time;
+                        if(found.Location === '') {
+                            found.Location = curr.Location;
+                            found.Date = curr.Date; 
+                            found.Time = curr.Time; 
+                        }
+
+                        else {
+
+                            found.Location += ";" + curr.Location;
+                            found.Date += ";" + curr.Date; 
+                            found.Time += ";" + curr.Time;
+                        }
                     }
                 
             }
@@ -1187,13 +1194,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
                         addBlackComments();
                         
+                        pObj.addLineBreak()                                               
                         pObj.addLineBreak()
     
                         if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                             pObj.addLineBreak()
 
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
@@ -1203,35 +1213,43 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
                             pObj.addText("Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
     
                         pObj.addLineBreak()
@@ -1307,13 +1325,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         // pObj.addLineBreak()
 
                                                 
+                        pObj.addLineBreak()                                               
                         pObj.addLineBreak()
-
+    
                         if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                             pObj.addLineBreak()
 
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
@@ -1323,35 +1344,43 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
                             pObj.addText("Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
     
                         pObj.addLineBreak()
@@ -1442,14 +1471,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         // pObj.addLineBreak()
                         // pObj.addLineBreak()
 
-                                                
+                        pObj.addLineBreak()                                               
                         pObj.addLineBreak()
     
                         if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                             pObj.addLineBreak()
 
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
@@ -1459,35 +1490,43 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
                             pObj.addText("Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
+                            pObj.addLineBreak()
             
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-
+                            pObj.addLineBreak()
                         }
 
                         else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
                             pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
                             pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
 
                         else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
                             pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+                            pObj.addLineBreak()
                         }
     
                         pObj.addLineBreak()
@@ -1538,9 +1577,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 pObj1.addLineBreak()
             }
         }
-
-        // years 
-        pObj1.addText( myStringOfYears , {bold: true, font_face: 'Calibri', font_size: 16 })
 
         // Let's generate the Word document into a file:
     
