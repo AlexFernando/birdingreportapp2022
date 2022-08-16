@@ -9,7 +9,6 @@ const {reverseString} = require('./helpers.js/reverseDates')
 
 function mySpecialFunction(initialDate, endDate, filename) {
 
-
     let results = []; //to save data after reading the file
     let filteredData = []; // data ready to write on the file 
     let excelData = require('./excelParserFilter')
@@ -116,10 +115,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         // MAKE updated of the new locations, date , time keys created
 
+        let myRegexNot = /\w+(?= seen)/gm;
         // 1) codigo de abajo
         arrLocationsUpdated = cleanKeys.map( elem => {
   
-            if( (elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase())) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase()) {
+            if( elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
+                
+                if(elem['Common Name'] === 'Sira Curassow') console.log(elem)
                 
                 if(elem['Observation Details'].match(subSpecieRegex)){
                     let sspElem = elem['Observation Details'].match(subSpecieRegex);
@@ -147,7 +149,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 return elem;
             }
 
-            else if (elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) ) {
+            else if (elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) &&  !elem['Observation Details'].toLowerCase().includes('Not Seen'.toLowerCase())) {
                 
                 if(elem['Observation Details'].match(subSpecieRegex)){
 
@@ -219,7 +221,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
   
             if(found) {
         
-                if((curr['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && !curr['Observation Details'].toLowerCase().includes('Seen'.toLowerCase())) || curr['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || curr['Observation Details'].trim() === 'H.'.toLowerCase()){
+                if( curr['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && (!curr['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) ||  (curr['Observation Details'].match(myRegexNot) && curr['Observation Details'].match(myRegexNot)[0] === 'not') || (curr['Observation Details'].match(myRegexNot) && curr['Observation Details'].match(myRegexNot)[0] === `wasn't` )) || curr['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || curr['Observation Details'].trim() === 'H.'.toLowerCase() ){
                     
                     if(curr.category.includes('subspecies')) {
                         found.subspecie += found.subspecie === '' ? curr.subspecie : ";" + curr.subspecie;
@@ -310,6 +312,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         let countNoCategories = 0;
         let countGroup = 0;
+        let countOtherCat = 0;
           
         //delete repeated locations
         let locationsHeardUpdated =  deleteDuplicates.map(elem => {
@@ -317,11 +320,19 @@ function mySpecialFunction(initialDate, endDate, filename) {
             elem.category.trim();
             elem.subspecie.trim();
 
-            // if(elem.category === '') {
-            //     countNoCategories++
-            //     console.log("elem: ", elem)
+            // if(elem.category === 'domestic' || elem.category === 'form' || elem.category === 'hybrid' || elem.category === 'intergrade' || elem.category === 'slash' || elem.category === 'spuh'|| elem.category === '(Vacías)') {
+            //     countOtherCat++
+            //     console.log(countOtherCat+ '.- ' + "COMMON NAME: ", elem['Common Name'],  " ", " SCIENTIFIC NAME: "+ elem['Scientific Name'] + "  CATEGORY: ",elem.category, '\n' )
             // }
 
+            // if(elem.category === '') {
+            //     countOtherCat++
+            //     console.log(countOtherCat+ '.- ' + "COMMON NAME: ", elem['Common Name'],  " ", " SCIENTIFIC NAME: "+ elem['Scientific Name'] + "  CATEGORY: ",elem.category, '\n' )
+            // }
+
+
+
+            // if(elem['Common Name'] === 'Sira Curassow') {console.log("weird element: " ,elem)}
 
             // if(elem.category.includes('group')) {
               
