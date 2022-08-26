@@ -1,4 +1,5 @@
 
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const e = require('cors');
 const csv = require('csv-parser');
 const fs = require('fs')
@@ -13,21 +14,66 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let filteredData = []; // data ready to write on the file 
     let excelData = require('./excelParserFilter')
     let excelRestrictrionCodes = require('./excelRestrictionCodes') //restriction code
+    let excelFindMissedBird = require('./excelFindMissedBird') // whole list world
+    let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
+    let excelConservationCodes = require('./excelConservationCode')//Conservation Code
 
     let filenameUploaded = filename;
     
     let familyData = excelData.familyResults();
     
     let restrictionCodeData = excelRestrictrionCodes.restrictioncodesResults();
+
+    let presenceCodeData = excelPresenceCodes.presenceCodesResults();
+   
+    let conservationCodeData = excelConservationCodes.conservationCodesResults();
+
+    let wholeDataList = excelFindMissedBird.worldLifeResults(); 
     
     let regExp = /\(([^)]+)\)/;
     
     let regExpGroup = /(\(\b)/;
     
     let subSpecieRegex = /(Ssp\.)\s[A-Za-z]*(\:)/gm
+
+    let conservationCodeArrFixed = conservationCodeData.map(elem => elem[0].split(",") )
+
+    let conservationCodeFinalArray = conservationCodeArrFixed.map(elem => {
+
+        if(elem.length === 5) {
+            
+            return ({ 
+                'SpcRecID': elem[0].slice(1, -1),
+                'Scientific name': elem[1].slice(1, -1),
+                'English name': elem[2].slice(1, -1),
+                'Family': elem[3].slice(1, -1),
+                'Conservation_Code': elem[4].slice(1, -1)
+            })
     
-    //Object.keys(elem).forEach(key => (elem[key] === null) && delete elem[key])
-    
+        }
+
+        else if(elem.length === 6) {
+            return ({ 
+                'SpcRecID': elem[0].slice(1, -1),
+                'Scientific name': elem[1].slice(1, -1),
+                'English name': elem[2].slice(1, -1),
+                'Family': elem[3].slice(1, -1) + " " + elem[4].slice(1, -1),
+                'Conservation_Code': elem[5].slice(1, -1)
+            })
+        }
+
+        else if(elem.length === 7) {
+            return ({ 
+                'SpcRecID': elem[0].slice(1, -1),
+                'Scientific name': elem[1].slice(1, -1),
+                'English name': elem[2].slice(1, -1),
+                'Family': elem[3].slice(1, -1) + " " + elem[4].slice(1, -1) + " " + elem[5].slice(1, -1),
+                'Conservation_Code': elem[6].slice(1, -1)
+            })
+        }
+    });
+      
+
     function filterData(results) {
     
         let count = 0;
@@ -66,7 +112,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let arrLocationsUpdated = [];
         let deleteDuplicates = [];
         let matchArray = [];
-    
+
         filteredData.map(elem => {
     
             //To no have problems later
@@ -111,6 +157,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
             elem.sspLocation = '';
             elem.sspDate = '';
             elem.sspTime = ''; 
+            elem.Restricction_Code = '';
+            elem.Presence_Code = '';
+            elem.Conservation_Code = '';
         })
 
         // MAKE updated of the new locations, date , time keys created
@@ -120,8 +169,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         arrLocationsUpdated = cleanKeys.map( elem => {
   
             if( elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
-                
-                if(elem['Common Name'] === 'Sira Curassow') console.log(elem)
                 
                 if(elem['Observation Details'].match(subSpecieRegex)){
                     let sspElem = elem['Observation Details'].match(subSpecieRegex);
@@ -320,25 +367,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             elem.category.trim();
             elem.subspecie.trim();
 
-            // if(elem.category === 'domestic' || elem.category === 'form' || elem.category === 'hybrid' || elem.category === 'intergrade' || elem.category === 'slash' || elem.category === 'spuh'|| elem.category === '(Vacías)') {
-            //     countOtherCat++
-            //     console.log(countOtherCat+ '.- ' + "COMMON NAME: ", elem['Common Name'],  " ", " SCIENTIFIC NAME: "+ elem['Scientific Name'] + "  CATEGORY: ",elem.category, '\n' )
-            // }
-
-            // if(elem.category === '') {
-            //     countOtherCat++
-            //     console.log(countOtherCat+ '.- ' + "COMMON NAME: ", elem['Common Name'],  " ", " SCIENTIFIC NAME: "+ elem['Scientific Name'] + "  CATEGORY: ",elem.category, '\n' )
-            // }
-
-
-
-            // if(elem['Common Name'] === 'Sira Curassow') {console.log("weird element: " ,elem)}
-
-            // if(elem.category.includes('group')) {
-              
-            //     console.log("elem category: ", elem.category,  "elem name ", elem['Common Name'])
-            //     countGroup++
-            // }
 
             if(elem.category.includes('subspecies')) {
 
@@ -489,10 +517,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 return elem;
         })
 
-
-        // console.log("countNoCategories: ", countNoCategories)
-        // console.log("coutnGroup: ", countGroup)
-
         let locationBothUpdated = locationsHeardUpdated.map( elem => {
             
             if(elem.category.includes('subspecies')) {
@@ -639,10 +663,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 return elem;
             }
 
-     
                 return elem;
-            
-            
         })
 
         let locationsSeenUpdated = locationBothUpdated.map( elem => {
@@ -788,11 +809,105 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 return elem;
             }
 
-        
-                return elem;
+            return elem;
         })
 
+        let arrOfGroups = []
+        let arrForms = []
+        let countForms = 0;
+        
+
+        // creating arr of groups and forms
         locationsSeenUpdated.map( elem => {
+                if(elem.category.includes("group")) {
+                    countGroup++;
+                    arrOfGroups.push(elem['Scientific Name'])
+                }
+
+                else if(elem.category.includes("form")) {
+                    countForms++;
+                    arrForms.push(elem['Scientific Name'])
+                }
+            }
+        )
+
+        // START create the arrays of form and groups that does not have specie associated
+
+        let countGroupMatch = 0;
+        let countFormMatch = 0;
+        let groupNoSpecies = [];
+        let formNoSpecies = [];
+
+        let groupsSpecie = arrOfGroups.map(elemGroup => {
+            let matchName = locationsSeenUpdated.find( elem => elemGroup.includes(elem['Scientific Name']) && elemGroup !== elem['Scientific Name'] )
+            
+            if(matchName !== undefined) {
+                countGroupMatch++
+            }
+
+            else {
+                groupNoSpecies.push(elemGroup)
+            }
+        })
+
+        let groupsFormSpecie = arrForms.map(elemForm => {
+            let matchName = locationsSeenUpdated.find( elem => elemForm.includes(elem['Scientific Name']) && elemForm !== elem['Scientific Name'])
+            
+            if(matchName !== undefined) {
+                countFormMatch++
+            }
+
+            else {
+                if(!elemForm.includes('undescribed')){
+                    formNoSpecies.push(elemForm)
+                }
+            }
+        })
+
+        // END
+
+
+        //start codes added
+
+        let arrRestCodesAdded = locationsSeenUpdated.map( elem => {
+            let matchName = restrictionCodeData.find( item => (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name']) && item['Restricction code'] !== '')
+
+            if(matchName && matchName['Restricction code'] !== '') {
+                elem['Restricction_Code'] = matchName['Restricction code'];
+                return elem;
+            }
+
+            return elem;
+        })
+
+
+        let arrPresenceCodesAdded = arrRestCodesAdded.map( elem => {
+            let matchName = presenceCodeData.find( item => (item['English name'] === elem['Common Name']  || item['Scientific name'] === elem['Scientific Name']) && (item['Peru'] !== '' || item['Peru'] !== 'X'))
+
+            if(matchName && matchName['Peru'] !== '' && matchName['Peru'] !== 'X') {
+                elem['Presence_Code'] = matchName['Peru'];
+                return elem;
+            }
+
+            return elem;
+        })
+
+        let arrConservationCodeAdded = arrPresenceCodesAdded.map( elem => {
+
+            let matchName = conservationCodeFinalArray.find( item => (item['English name'] === elem['Common Name']  || item['Scientific name'] === elem['Scientific Name']) && item['Conservation_Code'] !== '')
+
+            if(matchName && matchName['Conservation_Code'] !== '') {
+                elem['Conservation_Code'] = matchName['Conservation_Code'];
+                return elem;
+            }
+
+            return elem;
+        })
+
+        //finish codes added
+
+        
+        arrConservationCodeAdded.map( elem => {
 
             //match identical elements between both databases base on the Enlgish and Common name
             let nameMatch = familyData.find(el => el['English name'] === elem['Common Name']);
@@ -850,6 +965,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
             pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
             pObj.addLineBreak()
             value = objectFormat[key];
+
+
     
             for (let elem = 0; elem < value.length; elem++) {
     
@@ -862,12 +979,86 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 let sspLocation = value[elem]['sspLocation']
                 let sspLocationHeard = value[elem]['sspLocationHeard']
                 let sspLocationBoth = value[elem]['sspLocationBoth']
-                
 
-                // if (value[elem]['category'].includes('group')) {
-                //     console.log("elem group : ", value[elem])
-                //     countGroups++
-                // }    
+                function conservationCodeFunction () {
+                    if(value[elem]['Conservation_Code'] === 'LC') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '00af50'})
+                    }
+
+                    else if(value[elem]['Conservation_Code'] === 'NT') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '92d050'})
+                    }
+
+                    else if(value[elem]['Conservation_Code'] === 'VU') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ffc000'})
+                    }
+
+                    else if(value[elem]['Conservation_Code'] === 'EN') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'e26c09'})
+                    }
+
+                    else if(value[elem]['Conservation_Code'] === 'CR') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'C00000'})
+                    }
+            
+                    else if(value[elem]['Conservation_Code'] === 'DD') {
+                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'a6a6a6'})
+                    }
+                }
+
+                function presenceCodeFunc () {
+                    if(value[elem]['Presence_Code'] === 'NB') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('NB' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+                    }
+
+                    else if(value[elem]['Presence_Code'] === 'V') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('V' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+                    }
+
+                    else if(value[elem]['Presence_Code'] === 'IN') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('IN' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+                    }
+
+                    else if(value[elem]['Presence_Code'] === 'EX') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('EX' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+                    }
+
+                    else if(value[elem]['Presence_Code'] === 'H') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('H' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+                    }
+            
+                    else if(value[elem]['Presence_Code'] === 'X(e)') {
+                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+                        pObj.addText('E (PE)' , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ff0000'})
+                    }
+                }
+
+                function restricctionCodeFunc () {
+                    if(value[elem]['Restricction_Code'] === 'NE') {
+                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'c00000'})
+                    }
+
+                    else if(value[elem]['Restricction_Code'] === 'RR') {
+                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'e26c09'})
+                    }
+
+                    else if(value[elem]['Restricction_Code'] === 'LC') {
+                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffc000'})
+                    }
+                }
+                
+   
                 if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group')) {
                     numIndex++;
     
@@ -875,8 +1066,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     
                     pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
                     pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
-                    
-                    
+                
+                    //adding codes 
+                        conservationCodeFunction()
+                        presenceCodeFunc();
+                        restricctionCodeFunc();
+                        
+ 
                     pObj.addLineBreak()                                               
                     pObj.addLineBreak()
 
@@ -942,12 +1138,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                         if(subSpecieName.split(';').length > 1) {
                             pObj.addText('          '+subSpecieName.split(';')[0], {bold: true, font_face: 'Calibri', font_size: 12 })
+
                             pObj.addLineBreak()                                               
                             pObj.addLineBreak()
                             pObj.addText('          '+"Seen at: " + sspLocation.split(';')[0], { font_face: 'Calibri', font_size: 12 })
                             pObj.addLineBreak()
                             pObj.addLineBreak()
                             pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
+
                             pObj.addLineBreak()                                               
                             pObj.addLineBreak()
                             pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
@@ -957,6 +1155,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                         else {
                             pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
+
                             pObj.addLineBreak()                                               
                             pObj.addLineBreak()
                         }
@@ -1029,10 +1228,25 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     
                 else {
                     
+                    //hacer comparacion con un array construido con los elems que no tienen especie
+
+                    if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName)) {
+                        numIndex++;
+                        pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+                        pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
+                        pObj.addText(' (' + scientificName.split(' ')[0] + ' '+scientificName.split(' ')[1] + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+                        pObj.addLineBreak()
+                        pObj.addLineBreak()
+                    }
+
                     pObj.addText('     '+commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
                     pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
                     
-                    
+                    // adding codes
+                    conservationCodeFunction()
+                    presenceCodeFunc();
+                    restricctionCodeFunc();
+                 
                     pObj.addLineBreak()                                               
                     pObj.addLineBreak()
 
@@ -1104,12 +1318,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
                             pObj.addLineBreak()
                             pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
                             pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
+
                             pObj.addLineBreak()                                               
                             pObj.addLineBreak()
                         }
 
                         else {
                             pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
+
                             pObj.addLineBreak()                                               
                             pObj.addLineBreak()
                         }
@@ -1180,8 +1396,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 }
             }
         }
-
-        // console.log("countgroup: ", countGroups)
     
         pObj1 = docx.createP()
         pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
