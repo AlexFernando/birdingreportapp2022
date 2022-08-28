@@ -38,6 +38,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
     let conservationCodeArrFixed = conservationCodeData.map(elem => elem[0].split(",") )
 
+
     let conservationCodeFinalArray = conservationCodeArrFixed.map(elem => {
 
         if(elem.length === 5) {
@@ -866,9 +867,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         // END
 
-
-        //start codes added
-
         let arrRestCodesAdded = locationsSeenUpdated.map( elem => {
             let matchName = restrictionCodeData.find( item => (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name']) && item['Restricction code'] !== '')
 
@@ -880,7 +878,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             return elem;
         })
 
-
+  
         let arrPresenceCodesAdded = arrRestCodesAdded.map( elem => {
             let matchName = presenceCodeData.find( item => (item['English name'] === elem['Common Name']  || item['Scientific name'] === elem['Scientific Name']) && (item['Peru'] !== '' || item['Peru'] !== 'X'))
 
