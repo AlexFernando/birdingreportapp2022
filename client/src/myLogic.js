@@ -1,4 +1,5 @@
 
+const { Console } = require('console');
 const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const e = require('cors');
 const csv = require('csv-parser');
@@ -817,7 +818,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let arrForms = []
         let countForms = 0;
         
-
         // creating arr of groups and forms
         locationsSeenUpdated.map( elem => {
                 if(elem.category.includes("group")) {
@@ -832,24 +832,31 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         )
 
+        
+
         // START create the arrays of form and groups that does not have specie associated
 
         let countGroupMatch = 0;
         let countFormMatch = 0;
-        let groupNoSpecies = [];
-        let formNoSpecies = [];
+        let groupNoSpecies = ["fake"];
+        let formNoSpecies = ["fake"];
 
         let groupsSpecie = arrOfGroups.map(elemGroup => {
-            let matchName = locationsSeenUpdated.find( elem => elemGroup.includes(elem['Scientific Name']) && elemGroup !== elem['Scientific Name'] )
+            let matchName = locationsSeenUpdated.find( elem => elemGroup.includes(elem['Scientific Name']) && elemGroup !== elem['Scientific Name'])
             
             if(matchName !== undefined) {
                 countGroupMatch++
             }
 
             else {
-                groupNoSpecies.push(elemGroup)
+                if(groupNoSpecies.length >= 1  && !(groupNoSpecies[groupNoSpecies.length-1].split(' ')[0]+' '+groupNoSpecies[groupNoSpecies.length-1].split(' ')[1]).includes(elemGroup.split(' ')[0]+' '+elemGroup.split(' ')[1]) ){
+                    groupNoSpecies.push(elemGroup)
+                }
             }
         })
+
+        groupNoSpecies.shift()
+
 
         let groupsFormSpecie = arrForms.map(elemForm => {
             let matchName = locationsSeenUpdated.find( elem => elemForm.includes(elem['Scientific Name']) && elemForm !== elem['Scientific Name'])
@@ -859,11 +866,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
 
             else {
-                if(!elemForm.includes('undescribed')){
+                if(!elemForm.includes('undescribed') && formNoSpecies.length >= 1  && !(formNoSpecies[formNoSpecies.length-1].split(' ')[0]+' '+formNoSpecies[formNoSpecies.length-1].split(' ')[1]).includes(elemForm.split(' ')[0]+' '+elemForm.split(' ')[1])){
                     formNoSpecies.push(elemForm)
                 }
             }
         })
+        
+        formNoSpecies.shift()
+
 
         // END
 
@@ -904,11 +914,11 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         //finish codes added
 
+        let arrNoFamilies = [];
         
         arrConservationCodeAdded.map( elem => {
-
             //match identical elements between both databases base on the Enlgish and Common name
-            let nameMatch = familyData.find(el => el['English name'] === elem['Common Name']);
+            let nameMatch = familyData.find(el => el['scientific name'] === elem['Scientific Name']);
 
             let familyText = '';
     
@@ -917,11 +927,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 familyText = nameMatch.family;
     
                 if (familyText === '') {
-                    familyText = '(Others)';
+                    familyText = '(others)';
                 }
                 //finding a match between my array of objects and the familyDataBase 
                 let myArrayFamily = regExp.exec(familyText);
-    
+
+           
                 if (myArrayFamily !== null) {
                     let testFamilyName = myArrayFamily[1];
     
@@ -938,7 +949,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
 
         })
-
 
 
         //matching only species with the content of only Peru  but not others countries or locations outside Peru
@@ -960,7 +970,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
         for (key in objectFormat) {
             let familyName = key;
             pObj = docx.createP()
+     
             pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+            
+
             pObj.addLineBreak()
             value = objectFormat[key];
 
@@ -1077,8 +1090,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
                         pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                         pObj.addLineBreak()
-                        pObj.addLineBreak()
-        
+                        pObj.addLineBreak()        
                         pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
                         pObj.addLineBreak()
                         pObj.addLineBreak()
@@ -1228,7 +1240,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     
                     //hacer comparacion con un array construido con los elems que no tienen especie
 
-                    if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName)) {
+                    if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName) || commonName === 'Rock Pigeon (Feral Pigeon)') {
                         numIndex++;
                         pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
                         pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
