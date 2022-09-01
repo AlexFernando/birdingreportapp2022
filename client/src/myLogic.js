@@ -878,7 +878,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // END
 
         let arrRestCodesAdded = locationsSeenUpdated.map( elem => {
-            let matchName = restrictionCodeData.find( item => (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name']) && item['Restricction code'] !== '')
+            let matchName = restrictionCodeData.find( item => (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name'] || (elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[0]) && elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[1]) ) ) && item['Restricction code'] !== '')
 
             if(matchName && matchName['Restricction code'] !== '') {
                 elem['Restricction_Code'] = matchName['Restricction code'];
@@ -916,7 +916,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         let arrNoFamilies = [];
         
-        arrConservationCodeAdded.map( elem => {
+        arrConservationCodeAdded.map( (elem, index )=> {
             //match identical elements between both databases base on the Enlgish and Common name
             let nameMatch = familyData.find(el => el['scientific name'] === elem['Scientific Name']);
 
@@ -927,29 +927,34 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 familyText = nameMatch.family;
     
                 if (familyText === '') {
-                    familyText = '(others)';
-                }
+                    // familyText = '(others)';
+                    objectFormat['others'+index] = new Array();
+                    objectFormat['others'+index].push(elem)
+                }                
+
                 //finding a match between my array of objects and the familyDataBase 
-                let myArrayFamily = regExp.exec(familyText);
+
+                else {
+                    let myArrayFamily = regExp.exec(familyText);
 
            
-                if (myArrayFamily !== null) {
-                    let testFamilyName = myArrayFamily[1];
-    
-                    let realFamilyName = testFamilyName.toUpperCase();
-    
-                    if (oldTestVar !== testFamilyName) {
-                        oldTestVar = testFamilyName;
-    
-                        //adding the family name with uppercase letters
-                        objectFormat[realFamilyName] = new Array();
+                    if (myArrayFamily !== null) {
+                        let testFamilyName = myArrayFamily[1];
+        
+                        let realFamilyName = testFamilyName.toUpperCase();
+        
+                        if (oldTestVar !== testFamilyName) {
+                            oldTestVar = testFamilyName;
+        
+                            //adding the family name with uppercase letters
+                            objectFormat[realFamilyName] = new Array();
+                        }
+                        objectFormat[realFamilyName].push(elem)
                     }
-                    objectFormat[realFamilyName].push(elem)
+
                 }
             }
-
         })
-
 
         //matching only species with the content of only Peru  but not others countries or locations outside Peru
         familyData.map(item => {
@@ -970,11 +975,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
         for (key in objectFormat) {
             let familyName = key;
             pObj = docx.createP()
-     
-            pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
-            
 
-            pObj.addLineBreak()
+            if(familyName.includes('others')) {
+                console.log('no')
+            }
+
+            else {
+                pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+                pObj.addLineBreak()
+            }
+    
             value = objectFormat[key];
 
 
@@ -1068,25 +1078,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffc000'})
                     }
                 }
-                
-   
-                if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group')) {
-                    numIndex++;
-    
-                    pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
-                    
-                    pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                    pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
-                
-                    //adding codes 
-                        conservationCodeFunction()
-                        presenceCodeFunc();
-                        restricctionCodeFunc();
-                        
- 
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
 
+                function locationsFunc () {
                     if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
                         pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
                         pObj.addLineBreak()
@@ -1143,6 +1136,48 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                     pObj.addLineBreak()                                               
                     pObj.addLineBreak()
+                }
+
+            if(familyName.includes('others')) {
+                pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+                pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+            
+                //adding codes 
+                    conservationCodeFunction()
+                    presenceCodeFunc();
+                    restricctionCodeFunc();
+                 
+
+                pObj.addLineBreak()                                               
+                pObj.addLineBreak()
+
+                // locations func()
+                locationsFunc();
+
+            }
+
+            else {
+
+   
+                if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group')) {
+                    numIndex++;
+    
+                    pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+                    
+                    pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+                    pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+                
+                    //adding codes 
+                        conservationCodeFunction()
+                        presenceCodeFunc();
+                        restricctionCodeFunc();
+                        
+ 
+                    pObj.addLineBreak()                                               
+                    pObj.addLineBreak()
+                    
+                    // locations func()
+                    locationsFunc();
 
                     if( subSpecieName !== '') {
 
@@ -1260,64 +1295,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     pObj.addLineBreak()                                               
                     pObj.addLineBreak()
 
-
-                    if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
-                        pObj.addText('     '+"Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-        
-                        pObj.addText('     '+"Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-
-                        pObj.addText('     '+"Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
-                        pObj.addText('     '+"Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-        
-                        pObj.addText('     '+"Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
-                        pObj.addText('     '+"Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-        
-                        pObj.addText('     '+"Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
-                        pObj.addText('     '+"Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-        
-                        pObj.addText('     '+"Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
-                        pObj.addText('     '+"Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
-                        pObj.addText('     '+"Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
-                        pObj.addText('     '+"Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
-
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
+                    locationsFunc();
 
                     if( subSpecieName !== '') {
 
@@ -1401,9 +1379,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                     }
 
-
-
                 }
+            }
+            
+            
             }
         }
     
