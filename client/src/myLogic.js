@@ -1280,6 +1280,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
                         pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
                         pObj.addText(' (' + scientificName.split(' ')[0] + ' '+scientificName.split(' ')[1] + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+                        
+                        conservationCodeFunction()
+                        presenceCodeFunc();
+                        restricctionCodeFunc();
+                     
+                        
                         pObj.addLineBreak()
                         pObj.addLineBreak()
                     }
