@@ -849,6 +849,17 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let groupNoSpecies = ["fake"];
         let formNoSpecies = ["fake"];
 
+        // let arrNoMeSirve = arrOfGroups.map(elem => {
+        //     if( elem.split(' ').length >= 3 && (elem.split(" ")[1] === elem.split(" ")[2]) ) {
+        //         console.log("my group same name : ", elem)
+
+        //         return elem
+        //     }
+
+        //     else return elem;
+        // })
+
+
         let groupsSpecie = arrOfGroups.map(elemGroup => {
             let matchName = locationsSeenUpdated.find( elem => elemGroup.includes(elem['Scientific Name']) && elemGroup !== elem['Scientific Name'])
             
@@ -886,7 +897,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // END
 
         let arrRestCodesAdded = locationsSeenUpdated.map( elem => {
-            let matchName = restrictionCodeData.find( item => (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name'] || (elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[0]) && elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[1]) && elem['Common Name'].includes("("+item['English'].split(' ')[0]+")") && item['Restricction code'] !== '' )) && item['Restricction code'] !== '')
+            let matchName = restrictionCodeData.find( item => 
+                (item['English'] === elem['Common Name']  || item['Scientific Name'] === elem['Scientific Name'] || (elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[0]) 
+                && elem['Scientific Name'].includes(item['Scientific Name'].split(' ')[1]) && elem['Common Name'].includes("("+item['English'].split(' ')[0]+")") && item['English'].includes('**') && item['Restricction code'] !== '' )) && item['Restricction code'] !== '')
 
             if(matchName !== undefined && matchName['Restricction code'] !== '') {
                 elem['Restricction_Code'] = matchName['Restricction code'];
@@ -895,6 +908,37 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             return elem;
         })
+
+        // let arrExceptionsPresenceCode = [];
+
+        // let arrNotUse = arrRestCodesAdded.map( elem => {
+
+        //     let matchName = presenceCodeData.find( item => (item['Scientific name'].trim() === elem['Scientific Name'].trim()))
+
+        //     if(matchName) {
+        //         return elem;
+        //     }
+
+        //     else {
+        //         arrExceptionsPresenceCode.push(elem['Scientific Name']);
+        //         return elem;
+        //     }
+        // })
+
+        // let countElemt = 0
+
+        // let anotherNotUse = arrExceptionsPresenceCode.map( elem => {
+        //     let matchName = presenceCodeData.find( item => (item['Scientific name'].trim() !== elem.trim()) && elem.split(" ").length === 2 && !elem.includes("sp.") && item['Peru'] !== '')
+
+        //     if(matchName) {
+        //         countElemt++;
+        //         console.log(countElemt, ".- ", elem)
+
+        //         return elem
+        //     }
+        //     return elem;
+        // })
+
 
         let arrPresenceCodesAdded = arrRestCodesAdded.map( elem => {
 
@@ -908,11 +952,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
             return elem;
         })
 
+        //elem['Scientific Name'].split(" ").length >= 3 && elem['Scientific Name'].split(" ")[0].includes(item['Scientific name'].split(" ")[0]) && elem['Scientific Name'].split(" ")[2].includes(item['Scientific name'].split(" ")[1]) 
+
         let arrConservationCodeAdded = arrPresenceCodesAdded.map( elem => {
 
             let matchName = conservationCodeFinalArray.find( item => 
                 
-                (item['English name'] === elem['Common Name']  || item['Scientific name'] === elem['Scientific Name'] || ( (elem['Scientific Name'].split(" ")[0] +" "+elem['Scientific Name'].split(" ")[2]) === item['Scientific name'] && item['Conservation_Code'] !== '') && item['Conservation_Code'] !== '') )
+                (item['English name'] === elem['Common Name']  || item['Scientific name'] === elem['Scientific Name'] || 
+                ( ( elem['Scientific Name'].split(" ").length >= 3 && elem['Scientific Name'].split(" ")[0].includes(item['Scientific name'].split(" ")[0]) && elem['Scientific Name'].split(" ")[2].includes(item['Scientific name'].split(" ")[1])) && item['Conservation_Code'] !== '') && item['Conservation_Code'] !== '') )
 
             if(matchName && matchName['Conservation_Code'] !== '') {
                 elem['Conservation_Code'] = matchName['Conservation_Code'];
