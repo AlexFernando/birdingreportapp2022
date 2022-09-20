@@ -1,6 +1,6 @@
 
 const { Console } = require('console');
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG, SSL_OP_CIPHER_SERVER_PREFERENCE } = require('constants');
 const e = require('cors');
 const csv = require('csv-parser');
 const fs = require('fs')
@@ -199,7 +199,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.Time_both = '';
                 }
 
-                arrHeardSpecies.push(elem);
+                let objHeardSpecies = {}
+
+                objHeardSpecies['LocationHeardKey'] = elem['Location_heard'];
+                objHeardSpecies['ScientificNameKey'] = [elem['Scientific Name']];
+             
+
+                arrHeardSpecies.push(objHeardSpecies);
 
                 return elem;
             }
@@ -249,8 +255,65 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         })
 
-        // console.log("arrHeardSpecies: ", arrHeardSpecies);
+        //console.log("arrHeardSpecies: ", arrHeardSpecies);
+        //ARRAY OF HEARD SPECIES , FOR STATITISCS
+        let arrMergedHeardSpecies  = arrHeardSpecies.reduce( (accumulator ,curr) => {
 
+            // console.log("accum: ", accumulator, "curr: ", curr)
+         // Get the index of the key-value pair.
+            let occurs = accumulator.reduce(function(n, item, i) {
+                // console.log("n: ", n, "item: ", item, "i: ", i)
+                return (item.LocationHeardKey === curr.LocationHeardKey) ? i : n;
+            }, -1);
+
+              // If the name is found,
+            if (occurs >= 0) {
+
+                // append the current value to its list of values.
+                accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
+                // Otherwise,
+            } else {
+
+                // add the current item to o (but make sure the value is an array).
+                let obj = {
+                LocationHeardKey: curr.LocationHeardKey,
+                ScientificNameKey: curr.ScientificNameKey
+                };
+                accumulator = accumulator.concat([obj]);
+            }
+
+            return accumulator;
+        }, [])
+
+        arrMergedHeardSpecies.map( elem => {
+            const ocurrences = elem.ScientificNameKey.reduce( (acc, curr) => {
+                return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+            }, {})
+
+            elem.ScientificNameKey = ocurrences;
+        })
+
+        arrMergedHeardSpecies.map(elem => {
+            let sumSpeciesEachLocation = Object.values(elem.ScientificNameKey).reduce( (acc, curr) => {
+                return acc+curr;
+            })
+
+            elem.ScientificNameKey['Sum'] = sumSpeciesEachLocation;
+        })
+
+
+        arrMergedHeardSpecies.map(elem => {
+            let totalSumSpecies = elem.ScientificNameKey.Sum;
+
+            let percentageFrequencySp = Object.keys(elem.ScientificNameKey).map( frequencyOfSpecieKey => {
+                elem.ScientificNameKey[frequencyOfSpecieKey] = elem.ScientificNameKey[frequencyOfSpecieKey]/totalSumSpecies*100;
+                return frequencyOfSpecieKey/totalSumSpecies*100;
+            })
+
+        })
+
+        //END ARRAY OF HEARD SPECIES , FOR STATITISCS
+    
         //2.- modoficar elem.category el ';' por '&& o algo asi'
 
         arrLocationsUpdated.map( elem => {
@@ -267,6 +330,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 }
             }
         })
+
 
         //delete some duplicate keys
         //3.- ya no poner curr. category , simplemente agregar category separado por ';' y ssp localidad y date time a elem.subspecie, 
