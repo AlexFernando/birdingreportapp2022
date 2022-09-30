@@ -4,6 +4,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
 const myLogic = require('./client/src/myLogic');
+const { conservationCodesResults } = require('./client/src/excelConservationCode');
 
 //heroku config
 const port = process.env.PORT || 5000;
@@ -44,12 +45,12 @@ app.post('/upload', (req, res) => {
 
 //este post para recibir el dato 
 app.post('/dates', (req, res) => {
-    const myDates = req.body.myDates;
-    const filename = req.body.filename;
-    myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
-    myDates["loading"] = '';
-    res.json(myDates)
-    
+  const myDates = req.body.myDates;
+  const filename = req.body.filename;
+  myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
+  myDates["loading"] = '';
+  res.json(myDates)
+  
 })
 
 app.get('/download', (req, res) => {
