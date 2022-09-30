@@ -19,7 +19,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
     let excelConservationCodes = require('./excelConservationCode')//Conservation Code
 
-    let filenameUploaded = filename;
+    let filenameUploaded = filename; 
     
     let familyData = excelData.familyResults();
     
@@ -120,7 +120,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let arrHeardSpecies = []
 
         filteredData.map(elem => {
-    
             //To no have problems later
             if (!elem.hasOwnProperty('Observation Details')) {
                 elem['Observation Details'] = 'No';        
@@ -255,7 +254,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         })
 
-        //console.log("arrHeardSpecies: ", arrHeardSpecies);
+        // console.log("arrHeardSpecies: ", arrHeardSpecies);
         //ARRAY OF HEARD SPECIES , FOR STATITISCS
         let arrMergedHeardSpecies  = arrHeardSpecies.reduce( (accumulator ,curr) => {
 
@@ -311,6 +310,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
             })
 
         })
+
+        // console.log(arrMergedHeardSpecies)
+
+        fs.writeFile(__dirname +`/../../uploads/test.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
 
         //END ARRAY OF HEARD SPECIES , FOR STATITISCS
     
@@ -933,6 +942,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             else {
                 if(groupNoSpecies.length >= 1  && !(groupNoSpecies[groupNoSpecies.length-1].split(' ')[0]+' '+groupNoSpecies[groupNoSpecies.length-1].split(' ')[1]).includes(elemGroup.split(' ')[0]+' '+elemGroup.split(' ')[1]) ){
+                    // console.log("elem Group: ", elemGroup)
                     groupNoSpecies.push(elemGroup)
                 }
             }
@@ -950,6 +960,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             else {
                 if(!elemForm.includes('undescribed') && formNoSpecies.length >= 1  && !(formNoSpecies[formNoSpecies.length-1].split(' ')[0]+' '+formNoSpecies[formNoSpecies.length-1].split(' ')[1]).includes(elemForm.split(' ')[0]+' '+elemForm.split(' ')[1])){
+                    // console.log("elem form: ", elemForm)
                     formNoSpecies.push(elemForm)
                 }
             }
@@ -1019,6 +1030,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
         //elem['Scientific Name'].split(" ").length >= 3 && elem['Scientific Name'].split(" ")[0].includes(item['Scientific name'].split(" ")[0]) && elem['Scientific Name'].split(" ")[2].includes(item['Scientific name'].split(" ")[1]) 
 
         let arrConservationCodeAdded = arrPresenceCodesAdded.map( elem => {
+
+            // if(elem['Scientific Name'].includes('Lurocalis semitorquatus')) {
+            //     console.log(elem)
+            // }
 
             let matchName = conservationCodeFinalArray.find( item => 
                 
@@ -1559,7 +1574,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
 
 module.exports = {
-    mySpecialFunction: mySpecialFunction
+    mySpecialFunction: mySpecialFunction,
 };
 
 
