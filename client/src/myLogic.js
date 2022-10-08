@@ -25,8 +25,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
     let restrictionCodeData = excelRestrictrionCodes.restrictioncodesResults();
 
-    // console.log(restrictionCodeData);
-
     let presenceCodeData = excelPresenceCodes.presenceCodesResults();
    
     let conservationCodeData = excelConservationCodes.conservationCodesResults();
@@ -40,7 +38,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let subSpecieRegex = /(Ssp\.)\s[A-Za-z]*(\:)/gm
 
     let conservationCodeArrFixed = conservationCodeData.map(elem => elem[0].split(",") )
-
 
     let conservationCodeFinalArray = conservationCodeArrFixed.map(elem => {
 
@@ -125,7 +122,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 elem['Observation Details'] = 'No';        
             }
            
-            const allowed = ['Common Name', 'Scientific Name', 'Location', 'Observation Details', 'Date', 'Time'];
+            const allowed = ['Common Name', 'Scientific Name', 'Location', 'Observation Details', 'Date', 'Time', 'State/Province'];
     
             const filtered = Object.keys(elem)
                 .filter(key => allowed.includes(key))
@@ -173,6 +170,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // 1) codigo de abajo
         arrLocationsUpdated = cleanKeys.map( elem => {
   
+            // console.log(elem);
             if( elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
                 
                 if(elem['Observation Details'].match(subSpecieRegex)){
@@ -284,32 +282,64 @@ function mySpecialFunction(initialDate, endDate, filename) {
             return accumulator;
         }, [])
 
-        arrMergedHeardSpecies.map( elem => {
-            const ocurrences = elem.ScientificNameKey.reduce( (acc, curr) => {
-                return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
-            }, {})
+        // console.log(arrMergedHeardSpecies);
 
-            elem.ScientificNameKey = ocurrences;
-        })
-
-        arrMergedHeardSpecies.map(elem => {
-            let sumSpeciesEachLocation = Object.values(elem.ScientificNameKey).reduce( (acc, curr) => {
-                return acc+curr;
-            })
-
-            elem.ScientificNameKey['Sum'] = sumSpeciesEachLocation;
+        arrMergedHeardSpecies.map( objElem => {
+            
+            let ocurrences = objElem.ScientificNameKey.map( itemScientificName => ({name: itemScientificName, value: 1}))
+            objElem.ScientificNameKey = ocurrences;
         })
 
 
-        arrMergedHeardSpecies.map(elem => {
-            let totalSumSpecies = elem.ScientificNameKey.Sum;
 
-            let percentageFrequencySp = Object.keys(elem.ScientificNameKey).map( frequencyOfSpecieKey => {
-                elem.ScientificNameKey[frequencyOfSpecieKey] = elem.ScientificNameKey[frequencyOfSpecieKey]/totalSumSpecies*100;
-                return frequencyOfSpecieKey/totalSumSpecies*100;
-            })
+        arrMergedHeardSpecies.map( item => {
+            let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
+                const index = acc.findIndex(singleObj => {
+                    return singleObj["name"] === curr["name"]
+                });
+    
+                if (index >= 0) {
+                    var originalValue = acc[index]["value"];
+                    originalValue += curr["value"];
+                    acc[index]["value"] = originalValue;
+                }  
+    
+                else {
+                    acc.push(curr);
+                }
+            
+                return acc;
+            }, []);
 
-        })
+            item.ScientificNameKey = newMergedHeardSpecies
+        }) 
+        
+    
+        // arrMergedHeardSpecies.map( elem => {
+        //     const ocurrences = elem.ScientificNameKey.reduce( (acc, curr) => {
+        //         return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        //     }, {})
+
+        //     elem.ScientificNameKey = ocurrences;
+        // })
+
+        // arrMergedHeardSpecies.map(elem => {
+        //     let sumSpeciesEachLocation = Object.values(elem.ScientificNameKey).reduce( (acc, curr) => {
+        //         return acc+curr;
+        //     })
+
+        //     elem.ScientificNameKey['Sum'] = sumSpeciesEachLocation;
+        // })
+
+        // arrMergedHeardSpecies.map(elem => {
+        //     let totalSumSpecies = elem.ScientificNameKey.Sum;
+
+        //     let percentageFrequencySp = Object.keys(elem.ScientificNameKey).map( frequencyOfSpecieKey => {
+        //         elem.ScientificNameKey[frequencyOfSpecieKey] = elem.ScientificNameKey[frequencyOfSpecieKey]/totalSumSpecies*100;
+        //         return frequencyOfSpecieKey/totalSumSpecies*100;
+        //     })
+
+        // })
 
         // console.log(arrMergedHeardSpecies)
 
@@ -922,15 +952,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let groupNoSpecies = ["fake"];
         let formNoSpecies = ["fake"];
 
-        // let arrNoMeSirve = arrOfGroups.map(elem => {
-        //     if( elem.split(' ').length >= 3 && (elem.split(" ")[1] === elem.split(" ")[2]) ) {
-        //         console.log("my group same name : ", elem)
-
-        //         return elem
-        //     }
-
-        //     else return elem;
-        // })
 
 
         let groupsSpecie = arrOfGroups.map(elemGroup => {
@@ -942,7 +963,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             else {
                 if(groupNoSpecies.length >= 1  && !(groupNoSpecies[groupNoSpecies.length-1].split(' ')[0]+' '+groupNoSpecies[groupNoSpecies.length-1].split(' ')[1]).includes(elemGroup.split(' ')[0]+' '+elemGroup.split(' ')[1]) ){
-                    // console.log("elem Group: ", elemGroup)
                     groupNoSpecies.push(elemGroup)
                 }
             }
@@ -960,7 +980,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             else {
                 if(!elemForm.includes('undescribed') && formNoSpecies.length >= 1  && !(formNoSpecies[formNoSpecies.length-1].split(' ')[0]+' '+formNoSpecies[formNoSpecies.length-1].split(' ')[1]).includes(elemForm.split(' ')[0]+' '+elemForm.split(' ')[1])){
-                    // console.log("elem form: ", elemForm)
                     formNoSpecies.push(elemForm)
                 }
             }
@@ -1030,10 +1049,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         //elem['Scientific Name'].split(" ").length >= 3 && elem['Scientific Name'].split(" ")[0].includes(item['Scientific name'].split(" ")[0]) && elem['Scientific Name'].split(" ")[2].includes(item['Scientific name'].split(" ")[1]) 
 
         let arrConservationCodeAdded = arrPresenceCodesAdded.map( elem => {
-
-            // if(elem['Scientific Name'].includes('Lurocalis semitorquatus')) {
-            //     console.log(elem)
-            // }
 
             let matchName = conservationCodeFinalArray.find( item => 
                 
