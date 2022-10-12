@@ -200,7 +200,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                 objHeardSpecies['LocationHeardKey'] = elem['Location_heard'];
                 objHeardSpecies['ScientificNameKey'] = [elem['Scientific Name']];
-             
+                objHeardSpecies['CommonName'] = [elem['Common Name']];
 
                 arrHeardSpecies.push(objHeardSpecies);
 
@@ -268,13 +268,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                 // append the current value to its list of values.
                 accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
+                accumulator[occurs].CommonName = accumulator[occurs].CommonName.concat(curr.CommonName);
                 // Otherwise,
             } else {
 
                 // add the current item to o (but make sure the value is an array).
                 let obj = {
-                LocationHeardKey: curr.LocationHeardKey,
-                ScientificNameKey: curr.ScientificNameKey
+                    LocationHeardKey: curr.LocationHeardKey,
+                    ScientificNameKey: curr.ScientificNameKey,
+                    CommonName : curr.CommonName
                 };
                 accumulator = accumulator.concat([obj]);
             }
@@ -284,9 +286,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         // console.log(arrMergedHeardSpecies);
 
-        arrMergedHeardSpecies.map( objElem => {
-            
-            let ocurrences = objElem.ScientificNameKey.map( itemScientificName => ({name: itemScientificName, value: 1}))
+        arrMergedHeardSpecies.map( objElem => {            
+            let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx] }))
+
             objElem.ScientificNameKey = ocurrences;
         })
 
@@ -312,6 +314,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }, []);
 
             item.ScientificNameKey = newMergedHeardSpecies
+
+            delete item.CommonName;
         }) 
         
     

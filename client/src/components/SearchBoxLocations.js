@@ -17,7 +17,6 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
   const [userChoice, setUserChoice] = useState("");
 
- 
     let arrScientificNames = userChoice.length>0 && userChoice.map( elemChoice => {
       let objLocName = data.find( elem => elem.LocationHeardKey === elemChoice.value)
         if(objLocName) {
@@ -28,18 +27,15 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
           console.log('thanks')
         }
     })
-
-    console.log("userchoice: ", userChoice);
-
-    let counts = {}
-
-    console.log("arrScientificNames : ", arrScientificNames)
   
     useEffect(() => {
       // Only call setState within event handlers! 
       // Do not call setState inside the body of your function component
+
+
       let LocationsPercentageSpecies = [];
       let mySum = 0;
+
       
       if(arrScientificNames) {
 
@@ -54,7 +50,7 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
           });
 
           if (index >= 0) {
-              console.log("index : ", index, "acc[index] : ", acc[index])
+            
               let originalValue = acc[index]["value"];
           
               originalValue += curr["value"];
@@ -69,15 +65,12 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
           return acc;
       }, []);
 
-        console.log("totalArrs", JSON.stringify(totalArrays, null, 2));
-        console.log("newtotalMixed", JSON.stringify(newTotalMixedLocations, null, 2));
-
 
         newTotalMixedLocations.map( elem => {
             mySum += elem['value']
         })
 
-        console.log("mysum: " , mySum)
+   
 
         LocationsPercentageSpecies = newTotalMixedLocations.map( elem => {
              let percentageFrequencySp = ((elem['value']/mySum)*100).toFixed(2);
@@ -85,19 +78,9 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
              return elem;
         })
-
-        console.log("final arr: ", LocationsPercentageSpecies)
-
-        // Object.keys(counts).map(elem => {
-   
-        //   let percentageFrequencySp = ((counts[elem]/totalSumSpecies)*100).toFixed(2);
-  
-        //   counts[elem] = percentageFrequencySp;
-        // })
-  
-        // console.log("final array", counts);
     
     }
+      console.log("final: ", LocationsPercentageSpecies)
       getSpecies(LocationsPercentageSpecies);
       getSpeciesSum(mySum);
     },[userChoice])
