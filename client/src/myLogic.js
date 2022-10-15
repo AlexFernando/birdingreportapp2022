@@ -201,6 +201,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 objHeardSpecies['LocationHeardKey'] = elem['Location_heard'];
                 objHeardSpecies['ScientificNameKey'] = [elem['Scientific Name']];
                 objHeardSpecies['CommonName'] = [elem['Common Name']];
+                objHeardSpecies['Region'] = elem['State/Province'] 
 
                 arrHeardSpecies.push(objHeardSpecies);
 
@@ -276,7 +277,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 let obj = {
                     LocationHeardKey: curr.LocationHeardKey,
                     ScientificNameKey: curr.ScientificNameKey,
-                    CommonName : curr.CommonName
+                    CommonName : curr.CommonName,
+                    Region : curr.Region
                 };
                 accumulator = accumulator.concat([obj]);
             }
