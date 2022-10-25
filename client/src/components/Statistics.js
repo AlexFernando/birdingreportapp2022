@@ -9,6 +9,10 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
+import axios from 'axios';
+
+//In another component you need to get the array of audio recorded birds, filter that from obs.details, then you need to get the data  
+//(don't forget the code) required and build the link with the coe
 
 const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 
@@ -17,6 +21,7 @@ const StatisticsComponent = () => {
     const [speciesList, setSpeciesList] = useState([]);
     const [speciesSum, setSpeciesSum] = useState(0);
     const [tagFilter, setTagFilter] = useState(''); 
+    const [genereated, setGenerated] = useState(false);
 
     const getSpecies = (data) => {
         setSpeciesList(data)
@@ -42,6 +47,27 @@ const StatisticsComponent = () => {
         setTagFilter('Alphabetic Order')
     }
 
+    //Download Stats file
+
+  const onSubmitDownload = (e) => {
+    e.preventDefault()
+    window.open('/downloadstats');
+    console.log('great')
+  }
+
+  const handleStateListForRequest = () => {
+    const sendSpeciesList = async () => {
+        const res =  await axios.post('/writestats', {myStats: speciesList})
+        .then(res => console.log("res.data: ", res.data))
+        .catch(err => console.log(err.data))
+    
+     
+        }  
+        sendSpeciesList()
+
+        setGenerated(true)
+  }
+ 
     return(
         <Container>
             <Title>Statistics</Title>
@@ -88,11 +114,30 @@ const StatisticsComponent = () => {
                                 )
                             })
                         }
-
-
                     </tbody>
+
+
                 </TableTag>
+
+                {
+                    speciesList.length > 0?    
+                        <input onClick={handleStateListForRequest} type='submit'value='Generate Report' className='btn btn-primary btn-block mt-4'/>
+                    :null
+                }
+
+
             </TableContainer>
+
+            {/**Download file */}
+
+            {
+                genereated ? <div className="text-center">
+                <form onSubmit = {onSubmitDownload} >
+                  <input type="submit" value="Download" className="btn btn-primary btn-block mt-4" target="_self"/>
+                </form>
+              </div> : null
+            }
+                  
         </Container>
     )
 
@@ -117,7 +162,7 @@ const SearchBarContainer = styled.div`
     margin-top: calc(2rem);
     margin-bottom: calc(2rem);
 `
-const FilterContainer = styled.div`
+export const FilterContainer = styled.div`
     display: flex;
     justify-content: flex-start;
     align-items: center;

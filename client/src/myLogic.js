@@ -7,7 +7,7 @@ const fs = require('fs')
 const officegen = require('officegen');
 const {reverseString} = require('./helpers.js/reverseDates')
 
-
+const buildObjFile = require('./buildObjData');
 
 function mySpecialFunction(initialDate, endDate, filename) {
 
@@ -115,6 +115,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let matchArray = [];
 
         let arrHeardSpecies = []
+        let arrHeardSeenSpecies = []
+        let arrSpecies = []
 
         filteredData.map(elem => {
             //To no have problems later
@@ -136,9 +138,18 @@ function mySpecialFunction(initialDate, endDate, filename) {
             cleanKeys.push(filtered)
         })
 
+
+        //AUDIO RECORDED ARR
+            arrAudioRecorded = cleanKeys.filter(elem => elem['Observation Details'].toLowerCase().includes('audio recorded'))
+
+            arrAudioRecorded.map(elem => console.log(elem))
+        //AUDIO RECORDED ARR ENDS
+
+
         //CREATE  New Keys for objects  + location_heard, location_both, date_heart, date_both
 
         cleanKeys.forEach(elem => {
+
             elem.Location_heard = '';
             elem.Location_both = '';
             elem.Date_heard = '';
@@ -167,6 +178,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // MAKE updated of the new locations, date , time keys created
 
         let myRegexNot = /\w+(?= seen)/gm;
+
+
         // 1) codigo de abajo
         arrLocationsUpdated = cleanKeys.map( elem => {
   
@@ -233,6 +246,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.Date_heard = '';
                     elem.Time_heard = '';
                 }
+
+
+                let objHeardSeenSpecies = {}
+
+                objHeardSeenSpecies['LocationHeardKey'] = elem['Location_both'];
+                objHeardSeenSpecies['ScientificNameKey'] = [elem['Scientific Name']];
+                objHeardSeenSpecies['CommonName'] = [elem['Common Name']];
+                objHeardSeenSpecies['Region'] = elem['State/Province'] 
+
+                arrHeardSeenSpecies.push(objHeardSeenSpecies);
                   
                 return elem;
             }
@@ -248,6 +271,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspDate = elem.Date;
                     elem.sspTime = elem.Time; 
                 }
+
+                let objSpecies = {}
+
+                objSpecies['LocationHeardKey'] = elem['Location'];
+                objSpecies['ScientificNameKey'] = [elem['Scientific Name']];
+                objSpecies['CommonName'] = [elem['Common Name']];
+                objSpecies['Region'] = elem['State/Province'] 
+
+                arrSpecies.push(objSpecies);
 
                 return elem;
             }
@@ -285,7 +317,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             return accumulator;
         }, [])
-
         // console.log(arrMergedHeardSpecies);
 
         arrMergedHeardSpecies.map( objElem => {            
@@ -293,8 +324,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             objElem.ScientificNameKey = ocurrences;
         })
-
-
 
         arrMergedHeardSpecies.map( item => {
             let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
@@ -319,37 +348,28 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             delete item.CommonName;
         }) 
-        
-    
-        // arrMergedHeardSpecies.map( elem => {
-        //     const ocurrences = elem.ScientificNameKey.reduce( (acc, curr) => {
-        //         return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
-        //     }, {})
 
-        //     elem.ScientificNameKey = ocurrences;
-        // })
-
-        // arrMergedHeardSpecies.map(elem => {
-        //     let sumSpeciesEachLocation = Object.values(elem.ScientificNameKey).reduce( (acc, curr) => {
-        //         return acc+curr;
-        //     })
-
-        //     elem.ScientificNameKey['Sum'] = sumSpeciesEachLocation;
-        // })
-
-        // arrMergedHeardSpecies.map(elem => {
-        //     let totalSumSpecies = elem.ScientificNameKey.Sum;
-
-        //     let percentageFrequencySp = Object.keys(elem.ScientificNameKey).map( frequencyOfSpecieKey => {
-        //         elem.ScientificNameKey[frequencyOfSpecieKey] = elem.ScientificNameKey[frequencyOfSpecieKey]/totalSumSpecies*100;
-        //         return frequencyOfSpecieKey/totalSumSpecies*100;
-        //     })
-
-        // })
-
-        // console.log(arrMergedHeardSpecies)
+        let heardSeenBuildArr = buildObjFile.buildObjData(arrHeardSeenSpecies);
+        let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies)
+       
 
         fs.writeFile(__dirname +`/../../uploads/test.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
+
+        fs.writeFile(__dirname +`/../../uploads/heardSeenObj.js`, JSON.stringify(heardSeenBuildArr), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
+
+        fs.writeFile(__dirname +`/../../uploads/noObsDetailsObj.js`, JSON.stringify(noDetailsBuildArr), function(err) {
             if(err) {
                 return console.log(err);
             }
@@ -639,8 +659,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let locationBothUpdated = locationsHeardUpdated.map( elem => {
             
             if(elem.category.includes('subspecies')) {
-
-
 
                 if(elem.sspLocationBoth !== '') {
 
@@ -1008,37 +1026,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
             return elem;
         })
-
-        // let arrExceptionsPresenceCode = [];
-
-        // let arrNotUse = arrRestCodesAdded.map( elem => {
-
-        //     let matchName = presenceCodeData.find( item => (item['Scientific name'].trim() === elem['Scientific Name'].trim()))
-
-        //     if(matchName) {
-        //         return elem;
-        //     }
-
-        //     else {
-        //         arrExceptionsPresenceCode.push(elem['Scientific Name']);
-        //         return elem;
-        //     }
-        // })
-
-        // let countElemt = 0
-
-        // let anotherNotUse = arrExceptionsPresenceCode.map( elem => {
-        //     let matchName = presenceCodeData.find( item => (item['Scientific name'].trim() !== elem.trim()) && elem.split(" ").length === 2 && !elem.includes("sp.") && item['Peru'] !== '')
-
-        //     if(matchName) {
-        //         countElemt++;
-        //         console.log(countElemt, ".- ", elem)
-
-        //         return elem
-        //     }
-        //     return elem;
-        // })
-
 
         let arrPresenceCodesAdded = arrRestCodesAdded.map( elem => {
 
@@ -1591,8 +1578,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         .catch(error => console.log(error))
     
 }
-
-
 
 module.exports = {
     mySpecialFunction: mySpecialFunction,
