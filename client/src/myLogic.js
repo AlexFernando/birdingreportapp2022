@@ -6,8 +6,10 @@ const csv = require('csv-parser');
 const fs = require('fs')
 const officegen = require('officegen');
 const {reverseString} = require('./helpers.js/reverseDates')
+const {formatDates, formatTimes} = require('./helpers.js/formatDates')
 
 const buildObjFile = require('./buildObjData');
+const { format } = require('path');
 
 function mySpecialFunction(initialDate, endDate, filename) {
 
@@ -149,7 +151,11 @@ function mySpecialFunction(initialDate, endDate, filename) {
         //CREATE  New Keys for objects  + location_heard, location_both, date_heart, date_both
 
         cleanKeys.forEach(elem => {
-
+            //Start Format Date
+            elem.Date =  formatDates(elem.Date)
+            elem.Time = formatTimes(elem.Time)
+      
+            //End Format Date
             elem.Location_heard = '';
             elem.Location_both = '';
             elem.Date_heard = '';
@@ -418,12 +424,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
-                        
+                       
                         if(found.Location_heard === '') {
                             found.Location_heard = curr.Location_heard;
                             found.Date_heard = curr.Date_heard; 
                             found.Time_heard = curr.Time_heard; 
                         }
+
 
                         else {
                             found.Location_heard += ";" + curr.Location_heard;
@@ -463,7 +470,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 }
 
                 else {
-                                        
+                
                     if(curr.category.includes('subspecies')) {
                         // found.subspecie += found.subspecie === '' ? curr.subspecie : ";" + curr.subspecie;
                         found.subspecie += found.subspecie === '' ? curr.subspecie : ";" + curr.subspecie;
@@ -474,6 +481,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
+                        
                         if(found.Location === '') {
                             found.Location = curr.Location;
                             found.Date = curr.Date; 
@@ -548,12 +556,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     let locationDatesHeard = uniqueLocations.map( (elem, index) => {
     
                         if(uniqueLocations.length === 1) {
-                            return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")";
+                            return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") ";
                         }
     
                         else if (elem ==="duplicate") {
                             if( index === uniqueLocations.length -1) {
-                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")"; 
+                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") "; 
                             }
     
                             else {
@@ -563,15 +571,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
         
                         else {
                             if(index === 0) {
-                                return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
+                                return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
                             }
     
                             else if (index === uniqueLocations.length -1) {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +")";
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +") ";
                             }
                             
                             else {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
                             }
                         }
                     })
@@ -620,12 +628,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 let locationDatesHeard = uniqueLocations.map( (elem, index) => {
 
                     if(uniqueLocations.length === 1) {
-                        return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")";
+                        return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") ";
                     }
 
                     else if (elem ==="duplicate") {
                         if( index === uniqueLocations.length -1) {
-                            return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")"; 
+                            return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") "; 
                         }
 
                         else {
@@ -635,15 +643,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
                     else {
                         if(index === 0) {
-                            return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
+                            return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
                         }
 
                         else if (index === uniqueLocations.length -1) {
-                            return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +")";
+                            return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +") ";
                         }
                         
                         else {
-                            return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
+                            return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
                         }
                     }
                 })
@@ -698,12 +706,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     let locationDatesHeard = uniqueLocations.map( (elem, index) => {
     
                         if(uniqueLocations.length === 1) {
-                            return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")";
+                            return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") ";
                         }
     
                         else if (elem ==="duplicate") {
                             if( index === uniqueLocations.length -1) {
-                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")"; 
+                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") "; 
                             }
     
                             else {
@@ -713,15 +721,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
         
                         else {
                             if(index === 0) {
-                                return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
+                                return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
                             }
     
                             else if (index === uniqueLocations.length -1) {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +")";
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +") ";
                             }
                             
                             else {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
                             }
                         }
                     })
@@ -767,12 +775,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 let locationDatesBoth = uniqueLocations.map( (elem, index) => {
 
                     if(uniqueLocations.length === 1) {
-                        return elem + "(" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index] + ")";
+                        return elem + " (" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index] + ") ";
                     }
 
                     else if (elem ==="duplicate") {
                         if( index === uniqueLocations.length -1) {
-                            return ", " + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index] + ")"; 
+                            return ", " + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index] + ") "; 
                         }
 
                         else {
@@ -782,15 +790,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
                     else {
                         if(index === 0) {
-                            return elem + "(" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index];
+                            return elem + " (" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index];
                         }
 
                         else if (index === uniqueLocations.length -1) {
-                            return ") ;" + elem + "(" + reverseString(myDatesBoth[index]) +")" + "--"+ myTimeBoth[index];
+                            return ") ;" + elem + " (" + reverseString(myDatesBoth[index]) +")" + "--"+ myTimeBoth[index];
                         }
                         
                         else {
-                            return ") ;" + elem + "(" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index];
+                            return ") ;" + elem + " (" + reverseString(myDatesBoth[index]) + "--"+ myTimeBoth[index];
                         }
                     }
                 })
@@ -844,12 +852,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     let locationDatesHeard = uniqueLocations.map( (elem, index) => {
     
                         if(uniqueLocations.length === 1) {
-                            return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")";
+                            return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") ";
                         }
     
                         else if (elem ==="duplicate") {
                             if( index === uniqueLocations.length -1) {
-                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ")"; 
+                                return ", "+ reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] + ") "; 
                             }
     
                             else {
@@ -859,15 +867,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
         
                         else {
                             if(index === 0) {
-                                return elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
+                                return elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index];
                             }
     
                             else if (index === uniqueLocations.length -1) {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +")";
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) +"--" + myTimeHeard[index] +") ";
                             }
                             
                             else {
-                                return ") ;" + elem + "(" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
+                                return ") ;" + elem + " (" + reverseString(myDatesHeard[index]) + "--" + myTimeHeard[index] ;
                             }
                         }
                     })
@@ -913,12 +921,12 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 let locationDates = uniqueLocations.map( (elem, index) => {
 
                     if(uniqueLocations.length === 1) {
-                        return elem + "(" + reverseString(myDates[index]) + "--"+ myTime[index] + ")";
+                        return elem + " (" + reverseString(myDates[index]) + "--"+ myTime[index] + ") ";
                     }
 
                     else if (elem ==="duplicate") {
                         if( index === uniqueLocations.length -1) {
-                            return ", "+ reverseString(myDates[index]) + "--"+ myTime[index] + ")"; 
+                            return ", "+ reverseString(myDates[index]) + "--"+ myTime[index] + ") "; 
                         }
 
                         else {
@@ -928,15 +936,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
     
                     else {
                         if(index === 0) {
-                            return elem + "(" + reverseString(myDates[index]) + "--"+ myTime[index];
+                            return elem + " (" + reverseString(myDates[index]) + "--"+ myTime[index];
                         }
 
                         else if (index === uniqueLocations.length -1) {
-                            return ") ;" + elem + "(" + reverseString(myDates[index]) + "--"+ myTime[index] + ")";
+                            return ") ;" + elem + " (" + reverseString(myDates[index]) + "--"+ myTime[index] + ") ";
                         }
                         
                         else {
-                            return ") ;" + elem + "(" + reverseString(myDates[index]) + "--"+ myTime[index] ;
+                            return ") ;" + elem + " (" + reverseString(myDates[index]) + "--"+ myTime[index] ;
                         }
                     }
                 })
@@ -1130,8 +1138,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
     
             value = objectFormat[key];
-
-
     
             for (let elem = 0; elem < value.length; elem++) {
     
