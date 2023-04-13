@@ -27,6 +27,10 @@ const animatedComponents = makeAnimated();
 
 let RegionOptions = []
 
+/**hacer un array para paises 3 en este caso, luego crear un useState de pais , y cuando cambie userChoiceCountry se llenan
+ las respectivas regiones, basadas en el codigo , quizas tienes que emplear expresiones regualres.
+ */
+
 regionData.map(elem => {
     RegionOptions.push({value: elem['code'] , label:elem['State/Province_name']})
   }
@@ -57,26 +61,49 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
       setUserChoice(newChoices)
     }
 
+    const handleChoicesOnFilterOption = (choices, newData) => {
+      const updatedChoices = choices.length>0 && choices.map( elemChoice => {   
+        
+        if(elemChoice['value']) {
+          const objLocName = newData.find( elem => elem.LocationHeardKey === elemChoice.value)
+
+          if(objLocName !== undefined) {
+            return elemChoice;
+          }
+        }
+     
+      }).filter(Boolean)
+      return updatedChoices;
+    }
+
     //**START handlers for species based on Obs. Details */
 
     const handleFilterOptionClick = (option) => {
     
         switch (option) {
           case 'Only Heard':
-            
+            console.log("userChoice Heard Data: ", userChoice)
             setFilterOptions(data)
+            const updatedChoices = handleChoicesOnFilterOption(userChoice, data);
+            setUserChoice(updatedChoices)
             setTagFilterData("Only Heard")
             break;
           case 'Heard and Seen':
             setFilterOptions(heardSeenData)
+            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, heardSeenData);
+            setUserChoice(updatedChoicesSecond)
             setTagFilterData("Heard and Seen")
             break;
           case 'Only Seen':
             setFilterOptions(noObsDetailsData)
+            const updatedChoicesThird = handleChoicesOnFilterOption(userChoice, noObsDetailsData);
+            setUserChoice(updatedChoicesThird)
             setTagFilterData("Seen - (Not relevant Obs. Details)")
             break;
           case 'All Type of Obervations':
             setFilterOptions(allSpecies)
+            const updatedChoicesFour = handleChoicesOnFilterOption(userChoice, allSpecies);
+            setUserChoice(updatedChoicesFour)
             setTagFilterData("All Types of Observations")
             break;
           default:
@@ -132,7 +159,7 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
       let choicesTakenOut = [];
 
-
+      console.log("en useEffect: ", userChoice)
       const arrScientificNames = userChoice.length>0 && userChoice.map( elemChoice => {        
           const objLocName = filterOption.find( elem => elem.LocationHeardKey === elemChoice.value)
 
