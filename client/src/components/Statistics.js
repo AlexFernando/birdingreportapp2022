@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from "react";
-import AnimatedMulti from './SearchBoxLocations'
+import AnimatedMulti from './SearchBoxLocationsAlternative'
 import styled, { css } from 'styled-components'
 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
@@ -94,6 +94,10 @@ const StatisticsComponent = () => {
 
             <TableContainer>
                 <TableTag>
+                    {
+                        speciesList.length === 0 ? <div><span>No stats to show, yet. You may choose a Hotspot</span></div>
+                    
+                    :
                     <tbody>
                         <TextTable>
                             <th>Scientific Name</th>
@@ -103,20 +107,25 @@ const StatisticsComponent = () => {
                         </TextTable>
                         {
 
-                            speciesList.map(elem => {
-                                return(
-                                    <TextTable>
-                                        <TextColumn>{elem['name']}</TextColumn>
-                                        <TextColumn>{elem['CommonName']}</TextColumn>
-                                        <td>{elem['value']}</td>
-                                        <td>{elem['valuePercentage']}%</td>
-                                    </TextTable>
-                                )
+                            speciesList.length>0 && speciesList.map(elem => {
+                                if( elem && elem.name ){
+                                    return(
+                                        <TextTable>
+                                            <TextColumn>{elem['name']}</TextColumn>
+                                            <TextColumn>{elem['CommonName']}</TextColumn>
+                                            <td>{elem['value']}</td>
+                                            <td>{elem['valuePercentage']}%</td>
+                                        </TextTable>
+                                    )
+
+                                }
+                       
                             })
+
                         }
                     </tbody>
 
-
+                    }   
                 </TableTag>
 
                 {
@@ -166,6 +175,8 @@ export const FilterContainer = styled.div`
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 
     p{
         margin-bottom: 0;

@@ -119,6 +119,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let arrHeardSpecies = []
         let arrHeardSeenSpecies = []
         let arrSpecies = []
+        let arrSpeciesNoFilter = []
 
         filteredData.map(elem => {
             //To no have problems later
@@ -188,6 +189,17 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         // 1) codigo de abajo
         arrLocationsUpdated = cleanKeys.map( elem => {
+
+            //**NO filter array for stats*/
+
+            let objNoFilter = {}
+
+            objNoFilter['LocationHeardKey'] = elem['Location'];
+            objNoFilter['ScientificNameKey'] = [elem['Scientific Name']];
+            objNoFilter['CommonName'] = [elem['Common Name']];
+            objNoFilter['Region'] = elem['State/Province'] 
+
+            arrSpeciesNoFilter.push(objNoFilter);
   
             // console.log(elem);
             if( elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
@@ -356,7 +368,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
         }) 
 
         let heardSeenBuildArr = buildObjFile.buildObjData(arrHeardSeenSpecies);
-        let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies)
+        let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies);
+        let noFilterBuildArr = buildObjFile.buildObjData(arrSpeciesNoFilter);
        
 
         fs.writeFile(__dirname +`/../../uploads/test.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
@@ -376,6 +389,17 @@ function mySpecialFunction(initialDate, endDate, filename) {
         }); 
 
         fs.writeFile(__dirname +`/../../uploads/noObsDetailsObj.js`, JSON.stringify(noDetailsBuildArr), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
+
+
+        //**file no filter */
+
+        fs.writeFile(__dirname +`/../../uploads/noFilterObj.js`, JSON.stringify(noFilterBuildArr), function(err) {
             if(err) {
                 return console.log(err);
             }
