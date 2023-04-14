@@ -25,34 +25,42 @@ const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 
 const animatedComponents = makeAnimated();
 
-let RegionOptions = []
+let CountryOptions = [
+  {value: "PE-" , label: "Perú"},
+  {value: "CO-" , label: "Colombia"},
+  {value: "EC-" , label: "Ecuador"}
+]
+
 
 /**hacer un array para paises 3 en este caso, luego crear un useState de pais , y cuando cambie userChoiceCountry se llenan
  las respectivas regiones, basadas en el codigo , quizas tienes que emplear expresiones regualres.
  */
 
-regionData.map(elem => {
-    RegionOptions.push({value: elem['code'] , label:elem['State/Province_name']})
-  }
-)
-
 const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
-//probar a separar los effects
-//sera buena practica tener default state?
+    const [userChoiceCountry, setUserChoiceCountry] = useState([])
+
     const [userChoice, setUserChoice] = useState([]);
     const [userChoiceRegion, setUserChoiceRegion] = useState([]);
     const [filterOption, setFilterOptions] = useState([])
     const [tagFilterData, setTagFilterData] = useState("")
 
-
+    /**STATE FOR DROPDOWN LIST SEARCH REGION */
+    const [regionOptions, setRegionOptions] = useState([])
+  
     /**NEW STATES */
     const [locationOptions, setLocationOptions] = useState([]);
     //**END NEW STATES */
+  
+    /**START handler for updating country choices */
+    const handleOnChangeCountryChoices = (choicesCountry) => {
+      console.log("country choices", choicesCountry);
+      setUserChoiceCountry(choicesCountry);
+    }          
 
     /**START handler for updating region choices */
-    const handleOnChangeRegionChoices = (choicesRegion) => {
-      setUserChoiceRegion(choicesRegion);
+    const handleOnChangeRegionChoices = (choicesRegion, action) => {
+      setUserChoiceRegion(choicesRegion);      
     }
 
     /**START handler for update userChoices */
@@ -113,6 +121,34 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
     //** END handlers for species based on Obs. Details */
 
+
+    /**This useEffect mainly update Regions based on the change of the country. Those Regions will be displayed as a dropdown list on the corresponding search bar */
+    
+    useEffect(() => {
+
+      const RegionsListSearch = userChoiceCountry.length>0 && userChoiceCountry.map( elemCountryChoice => {
+        return regionData.filter(elem => elem.code.includes(elemCountryChoice.value))
+      })
+
+      console.log("RegionList: ", RegionsListSearch)
+
+      if(RegionsListSearch.length>0) {
+       const RegionListSearchCleaned = [].concat(...RegionsListSearch);
+        console.log("Region Cleaned: ", RegionListSearchCleaned)
+        const RegionOptionList = RegionListSearchCleaned.map( elem => {
+          return {value: elem['code'], label:elem['State/Province_name']}
+        })
+        setRegionOptions(RegionOptionList);
+        // setUserChoiceRegion(RegionOptionList);
+      }
+
+      // else{
+      //   setUserChoiceRegion([]);
+      // }
+    }, [userChoiceCountry])
+
+
+    /**This useEffect mainly update hotspot locations based on the changes of the region. Those locations will be displayed as a dropdown list on the corresponding search bar */
     useEffect(() => {
 
         const arrOfRegions = userChoiceRegion.length>0 && userChoiceRegion.map( elemRegionChoice => {
@@ -264,7 +300,7 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
     return (
 
       <>
-        <p>When you select a Region and "Filter by" option, you will be able to see a list of hotspots in the second bar related to the selected region(s)</p>
+
         <FilterContainer>
 
         <DropdownButton
@@ -285,16 +321,26 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
         </FilterContainer>
 
         <SelectContainer>
-          
+          <MyCustomSelect
+            closeMenuOnSelect={true}
+            components={animatedComponents}
+            placeholder="Search a Country..."
+            isMulti
+            options={CountryOptions}
+            onChange={(choice) => handleOnChangeCountryChoices(choice)}
+            value = {userChoiceCountry}
+            allowSelectAll={true}
+          />
 
+        <p>When you select a "Filter by" option, you will be able to see a list of Regions options</p>
 
           <MyCustomSelect
             closeMenuOnSelect={true}
             components={animatedComponents}
             placeholder="Search a Region/State..."
             isMulti
-            options={RegionOptions}
-            onChange={(choice) => handleOnChangeRegionChoices(choice)}
+            options={regionOptions}
+            onChange={(choice, action) => handleOnChangeRegionChoices(choice, action)}
             value = {userChoiceRegion}
             allowSelectAll={true}
           />
