@@ -8,15 +8,15 @@ const MySelect = props => {
       <ReactSelect
         {...props}
         options={[props.allOption, ...props.options]}
-        onChange={selected => {
+        onChange={(selected, action) => {
           if (
             selected !== null &&
             selected.length > 0 &&
             selected[selected.length - 1].value === props.allOption.value
           ) {
-            return props.onChange(props.options);
+            return props.onChange(props.options, action);
           }
-          return props.onChange(selected);
+          return props.onChange(selected, action);
         }}
       />
     );

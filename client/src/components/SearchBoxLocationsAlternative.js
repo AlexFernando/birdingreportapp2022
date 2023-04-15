@@ -31,12 +31,32 @@ let CountryOptions = [
   {value: "EC-" , label: "Ecuador"}
 ]
 
+const dataMixArr = noObsDetailsData.concat(heardSeenData);
 
-/**hacer un array para paises 3 en este caso, luego crear un useState de pais , y cuando cambie userChoiceCountry se llenan
- las respectivas regiones, basadas en el codigo , quizas tienes que emplear expresiones regualres.
- */
+//  const filteredObjects = data.filter(obj => {
+//   return obj.ScientificNameKey.some(innerObj => {
+//     return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
+//                    .some(otherInnerObj => otherInnerObj.name === innerObj.name);
+//   });
+// });
+
+const filteredData = data.map(obj => {
+  const filteredScientificNameKey = obj.ScientificNameKey.filter(innerObj => {
+    return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
+                   .some(otherInnerObj => otherInnerObj.name === innerObj.name);
+  }).map(filteredObj => {
+    return { name: filteredObj.name, value: filteredObj.value, CommonName: filteredObj.CommonName };
+  });
+  return { LocationHeardKey: obj.LocationHeardKey, ScientificNameKey: filteredScientificNameKey, Region: obj.Region };
+});
+
+console.log("buena data: ", filteredData);
 
 const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
+
+    console.log("heardData: ", data);
+    console.log("heardSeenData: ", heardSeenData);
+    console.log("Seen data", noObsDetailsData)
 
     const [userChoiceCountry, setUserChoiceCountry] = useState([])
 
@@ -91,27 +111,35 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
         switch (option) {
           case 'Only Heard':
             console.log("userChoice Heard Data: ", userChoice)
-            setFilterOptions(data)
-            const updatedChoices = handleChoicesOnFilterOption(userChoice, data);
+            setFilterOptions(filteredData)
+            const updatedChoices = handleChoicesOnFilterOption(userChoice, filteredData);
             setUserChoice(updatedChoices)
             setTagFilterData("Only Heard")
             break;
+
+          case 'Heard Included': 
+            setFilterOptions(data)
+            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, data);
+            setUserChoice(updatedChoicesSecond)
+            setTagFilterData("Heard Included")
+             break;
+
           case 'Heard and Seen':
             setFilterOptions(heardSeenData)
-            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, heardSeenData);
-            setUserChoice(updatedChoicesSecond)
+            const updatedChoicesThird = handleChoicesOnFilterOption(userChoice, heardSeenData);
+            setUserChoice(updatedChoicesThird)
             setTagFilterData("Heard and Seen")
             break;
           case 'Only Seen':
             setFilterOptions(noObsDetailsData)
-            const updatedChoicesThird = handleChoicesOnFilterOption(userChoice, noObsDetailsData);
-            setUserChoice(updatedChoicesThird)
+            const updatedChoicesFour = handleChoicesOnFilterOption(userChoice, noObsDetailsData);
+            setUserChoice(updatedChoicesFour)
             setTagFilterData("Seen - (Not relevant Obs. Details)")
             break;
           case 'All Type of Obervations':
             setFilterOptions(allSpecies)
-            const updatedChoicesFour = handleChoicesOnFilterOption(userChoice, allSpecies);
-            setUserChoice(updatedChoicesFour)
+            const updatedChoicesFive = handleChoicesOnFilterOption(userChoice, allSpecies);
+            setUserChoice(updatedChoicesFive)
             setTagFilterData("All Types of Observations")
             break;
           default:
@@ -310,6 +338,7 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
             title="Filter By"
         >
             <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Only Heard')} >Only Heard</Dropdown.Item>
+            <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Heard Included')} >Heard Included</Dropdown.Item>
             <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Heard and Seen')} >Heard and Seen</Dropdown.Item>
             <Dropdown.Item eventKey="3" onClick={() => handleFilterOptionClick('Only Seen')} >Only Seen</Dropdown.Item>
             <Dropdown.Item eventKey="4" onClick={() => handleFilterOptionClick('All Type of Obervations')} >All Type Of Observations</Dropdown.Item>

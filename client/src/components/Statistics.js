@@ -100,6 +100,7 @@ const StatisticsComponent = () => {
                     :
                     <tbody>
                         <TextTable>
+                            <th>Nº</th>
                             <th>Scientific Name</th>
                             <th>English Name</th>
                             <th>Frequency</th>
@@ -107,10 +108,11 @@ const StatisticsComponent = () => {
                         </TextTable>
                         {
 
-                            speciesList.length>0 && speciesList.map(elem => {
+                            speciesList.length>0 && speciesList.map((elem, idx) => {
                                 if( elem && elem.name ){
                                     return(
                                         <TextTable>
+                                            <td><span>{idx+1}</span></td>
                                             <TextColumn>{elem['name']}</TextColumn>
                                             <TextColumn>{elem['CommonName']}</TextColumn>
                                             <td>{elem['value']}</td>
