@@ -12,6 +12,9 @@ const buildObjFile = require('./buildObjData');
 // const { format } = require('path');
 const path = require('path');
 
+const async = require('async');
+
+
 function mySpecialFunction(initialDate, endDate, filename) {
 
     let results = []; //to save data after reading the file
@@ -144,7 +147,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
 
         //AUDIO RECORDED ARR
-            arrAudioRecorded = cleanKeys.filter(elem => elem['Observation Details'].toLowerCase().includes('audio recorded'))
+            let arrAudioRecorded = cleanKeys.filter(elem => elem['Observation Details'].toLowerCase().includes('audio recorded'))
         //AUDIO RECORDED ARR ENDS
 
 
@@ -411,30 +414,71 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         console.log("antes de escribir archivos")
 
-        // const filesToWrite = [
-        //     { fileName: 'onlyHeard.js', data: onlyHeardSpecies },
-        //     { fileName: 'allHeardSpecies.js', data: arrMergedHeardSpecies },
-        //     { fileName: 'heardSeenSpecies.js', data: heardSeenBuildArr },
-        //     // { fileName: 'noObsDetailsObj.js', data: noDetailsBuildArr },
-        //     // { fileName: 'noFilterObj.js', data: noFilterBuildArr },
-        // ];
+        const filesToWrite = [
+            { fileName: 'onlyHeard.js', data: onlyHeardSpecies },
+            { fileName: 'allHeardSpecies.js', data: arrMergedHeardSpecies },
+            { fileName: 'heardSeenSpecies.js', data: heardSeenBuildArr },
+            { fileName: 'noObsDetailsObj.js', data: noDetailsBuildArr },
+            { fileName: 'noFilterObj.js', data: noFilterBuildArr },
+        ];
+
+
+// const writeFiles = (filesToWrite, uploadsDir) => {
+//   async.eachSeries(filesToWrite, (file, callback) => {
+//     const filePath = path.join(uploadsDir, file.fileName);
+//     fs.writeFile(filePath, JSON.stringify(file.data), (err) => {
+//       if (err) {
+//         console.log(`Error writing file ${file.fileName}: ${err.message}`);
+//       } else {
+//         console.log(`File ${file.fileName} written successfully`);
+//       }
+//       callback(err);
+//     });
+//   }, (err) => {
+//     if (err) {
+//       console.log(`Error writing files: ${err.message}`);
+//     } else {
+//       console.log('All files written successfully');
+//     }
+//   });
+// };
+
+
+
+const writeFiles = (filesToWrite, uploadsDir) => {
+    for (let file of filesToWrite) {
+      const filePath = path.join(uploadsDir, file.fileName);
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(file.data));
+        console.log(`File ${file.fileName} written successfully`);
+      } catch (err) {
+        console.log(`Error writing file ${file.fileName}: ${err.message}`);
+        break; // stop the loop if an error occurs
+      }
+
+      const memoryUsage = process.memoryUsage();
+      console.log(`Memory usage: ${JSON.stringify(memoryUsage)}`);
+    }
+  };
+  
+  const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
+writeFiles(filesToWrite, uploadsDir);
+
 
         // const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
 
         // filesToWrite.forEach((file) => {
 
         //     const filePath = path.join(uploadsDir, file.fileName);
-        //     try {
-        //         fs.writeFile(filePath, JSON.stringify(file.data))
-        //         console.log(`${file.fileName} was saved`);
-        //     } catch(err) {
-        //         console.error('Error writing file:', err);
-        //     }
 
-        //     // fs.writeFile(filePath, JSON.stringify(file.data), (err) => {
-        //     //     if (err) throw err;
-        //     //     console.log(`${file.fileName} was saved`);
-        //     // });
+        //     fs.writeFileSync(__dirname +`/../../uploads/${file.fileName}`, JSON.stringify(file.data), function(err) {
+        //         if(err) {
+        //             return console.log(err);
+        //         }
+
+        //         console.log("The file was saved!");
+        //     }); 
+    
         // });
 
         // async function writeFiles(filesToWrite) {
@@ -462,14 +506,14 @@ function mySpecialFunction(initialDate, endDate, filename) {
         //   console.error('Error writing file:', err);
         // }
 
-        fs.writeFile(__dirname +`/../../uploads/onlyHeard.js`, JSON.stringify(onlyHeardSpecies), function(err) {
-            console.log("entramos a escribir archivos")
-            if(err) {
-                return console.log(err);
-            }
+        // fs.writeFileSync(__dirname +`/../../uploads/onlyHeard.js`, JSON.stringify(onlyHeardSpecies), function(err) {
+        //     console.log("entramos a escribir archivos")
+        //     if(err) {
+        //         return console.log(err);
+        //     }
         
-            console.log("The file was saved!");
-        }); 
+        //     console.log("The file was saved!");
+        // }); 
 
 
         // fs.writeFileSync(__dirname +`/../../uploads/allHeardSpecies.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
@@ -1674,13 +1718,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         console.log("Hola vamos a terminar el programa")
     
-        pObj1 = docx.createP()
-        pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
-        pObj1.addLineBreak()
-        pObj1.addLineBreak()
-        pObj1.addText('Scientific Names of Groups', {bold: true, font_face: 'Calibri', font_size: 16 })
-        pObj1.addLineBreak()
-        pObj1.addLineBreak()
+        // pObj1 = docx.createP()
+        // pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+        // pObj1.addLineBreak()
+        // pObj1.addLineBreak()
+        // pObj1.addText('Scientific Names of Groups', {bold: true, font_face: 'Calibri', font_size: 16 })
+        // pObj1.addLineBreak()
+        // pObj1.addLineBreak()
 
     
         let out = fs.createWriteStream('Report.docx')

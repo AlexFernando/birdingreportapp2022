@@ -18,10 +18,11 @@ import {FilterContainer} from './Statistics'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import MyCustomSelect from './MyCustomSelect';
 
 /**IMPORT REACT SELECT */
 
-import MyCustomSelect from './MyCustomSelect';
+
 const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 
 const animatedComponents = makeAnimated();
