@@ -19,7 +19,6 @@ function formatDates(str) {
 function formatTimes(str) {
     if(str.length > 0 && str.slice(0,1) === '0') {
         //changing the format 
-        console.log("Pase la condicion")
         let newFormatTime = str.slice(1, str.length);
 
         return newFormatTime;

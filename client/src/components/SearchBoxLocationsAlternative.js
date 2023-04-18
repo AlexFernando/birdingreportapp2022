@@ -3,7 +3,8 @@ import React, {useState , useEffect} from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import allSpecies from './allSpecies.json'
-import data from './MyHeardSpecies.json'
+import onlyHeardData from './onlyHeard.json'
+import heardData from './MyHeardSpecies.json'
 import heardSeenData from './MyHeardSeenSpecies.json'
 import noObsDetailsData from './noObsDetailsSpecies.json'
 import regionData from './regions.json'
@@ -31,7 +32,7 @@ let CountryOptions = [
   {value: "EC-" , label: "Ecuador"}
 ]
 
-const dataMixArr = noObsDetailsData.concat(heardSeenData);
+// const dataMixArr = noObsDetailsData.concat(heardSeenData);
 
 //  const filteredObjects = data.filter(obj => {
 //   return obj.ScientificNameKey.some(innerObj => {
@@ -40,21 +41,21 @@ const dataMixArr = noObsDetailsData.concat(heardSeenData);
 //   });
 // });
 
-const filteredData = data.map(obj => {
-  const filteredScientificNameKey = obj.ScientificNameKey.filter(innerObj => {
-    return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
-                   .some(otherInnerObj => otherInnerObj.name === innerObj.name);
-  }).map(filteredObj => {
-    return { name: filteredObj.name, value: filteredObj.value, CommonName: filteredObj.CommonName };
-  });
-  return { LocationHeardKey: obj.LocationHeardKey, ScientificNameKey: filteredScientificNameKey, Region: obj.Region };
-});
+// const filteredData = data.map(obj => {
+//   const filteredScientificNameKey = obj.ScientificNameKey.filter(innerObj => {
+//     return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
+//                    .some(otherInnerObj => otherInnerObj.name === innerObj.name);
+//   }).map(filteredObj => {
+//     return { name: filteredObj.name, value: filteredObj.value, CommonName: filteredObj.CommonName };
+//   });
+//   return { LocationHeardKey: obj.LocationHeardKey, ScientificNameKey: filteredScientificNameKey, Region: obj.Region };
+// });
 
-console.log("buena data: ", filteredData);
+// console.log("buena data: ", filteredData);
 
 const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
-    console.log("heardData: ", data);
+    console.log("heardData: ", heardData);
     console.log("heardSeenData: ", heardSeenData);
     console.log("Seen data", noObsDetailsData)
 
@@ -111,15 +112,15 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
         switch (option) {
           case 'Only Heard':
             console.log("userChoice Heard Data: ", userChoice)
-            setFilterOptions(filteredData)
-            const updatedChoices = handleChoicesOnFilterOption(userChoice, filteredData);
+            setFilterOptions(onlyHeardData)
+            const updatedChoices = handleChoicesOnFilterOption(userChoice, onlyHeardData);
             setUserChoice(updatedChoices)
             setTagFilterData("Only Heard")
             break;
 
           case 'Heard Included': 
-            setFilterOptions(data)
-            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, data);
+            setFilterOptions(heardData)
+            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, heardData);
             setUserChoice(updatedChoicesSecond)
             setTagFilterData("Heard Included")
              break;
