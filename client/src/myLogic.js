@@ -9,7 +9,8 @@ const {reverseString} = require('./helpers.js/reverseDates')
 const {formatDates, formatTimes} = require('./helpers.js/formatDates')
 
 const buildObjFile = require('./buildObjData');
-const { format } = require('path');
+// const { format } = require('path');
+const path = require('path');
 
 function mySpecialFunction(initialDate, endDate, filename) {
 
@@ -405,11 +406,52 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         let onlyHeardSpecies = buildObjFile.buildObjData(arrOnlyHeardSpecies);
         let heardSeenBuildArr = buildObjFile.buildObjData(arrHeardSeenSpecies);
-        // let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies);
+        let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies);
         let noFilterBuildArr = buildObjFile.buildObjData(arrSpeciesNoFilter);
 
         console.log("antes de escribir archivos")
 
+        // const filesToWrite = [
+        //     { fileName: 'onlyHeard.js', data: onlyHeardSpecies },
+        //     { fileName: 'allHeardSpecies.js', data: arrMergedHeardSpecies },
+        //     { fileName: 'heardSeenSpecies.js', data: heardSeenBuildArr },
+        //     // { fileName: 'noObsDetailsObj.js', data: noDetailsBuildArr },
+        //     // { fileName: 'noFilterObj.js', data: noFilterBuildArr },
+        // ];
+
+        // const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
+
+        // filesToWrite.forEach((file) => {
+
+        //     const filePath = path.join(uploadsDir, file.fileName);
+        //     try {
+        //         fs.writeFile(filePath, JSON.stringify(file.data))
+        //         console.log(`${file.fileName} was saved`);
+        //     } catch(err) {
+        //         console.error('Error writing file:', err);
+        //     }
+
+        //     // fs.writeFile(filePath, JSON.stringify(file.data), (err) => {
+        //     //     if (err) throw err;
+        //     //     console.log(`${file.fileName} was saved`);
+        //     // });
+        // });
+
+        // async function writeFiles(filesToWrite) {
+        //     const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
+          
+        //     for (const file of filesToWrite) {
+        //       const filePath = path.join(uploadsDir, file.fileName);
+        //       try {
+        //         await fs.promises.writeFile(filePath, JSON.stringify(file.data));
+        //         console.log(`${file.fileName} was saved`);
+        //       } catch (err) {
+        //         console.error('Error writing file:', err);
+        //       }
+        //     }
+        //   }
+          
+        //   writeFiles(filesToWrite);
 
         // const data = 'Hello, world!';
 
@@ -419,8 +461,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // } catch (err) {
         //   console.error('Error writing file:', err);
         // }
-       
-        fs.writeFileSync(__dirname +`/../../uploads/onlyHeard.js`, JSON.stringify(onlyHeardSpecies), function(err) {
+
+        fs.writeFile(__dirname +`/../../uploads/onlyHeard.js`, JSON.stringify(onlyHeardSpecies), function(err) {
             console.log("entramos a escribir archivos")
             if(err) {
                 return console.log(err);
@@ -430,23 +472,23 @@ function mySpecialFunction(initialDate, endDate, filename) {
         }); 
 
 
-        fs.writeFileSync(__dirname +`/../../uploads/allHeardSpecies.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
-            if(err) {
-                return console.log(err);
-            }
+        // fs.writeFileSync(__dirname +`/../../uploads/allHeardSpecies.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
+        //     if(err) {
+        //         return console.log(err);
+        //     }
         
-            console.log("The file was saved!");
-        }); 
+        //     console.log("The file was saved!");
+        // }); 
         
 
 
-        fs.writeFileSync(__dirname +`/../../uploads/heardSeenSpecies.js`, JSON.stringify(heardSeenBuildArr), function(err) {
-            if(err) {
-                return console.log(err);
-            }
+        // fs.writeFileSync(__dirname +`/../../uploads/heardSeenSpecies.js`, JSON.stringify(heardSeenBuildArr), function(err) {
+        //     if(err) {
+        //         return console.log(err);
+        //     }
         
-            console.log("The file was saved!");
-        }); 
+        //     console.log("The file was saved!");
+        // }); 
 
         // fs.writeFileSync(__dirname +`/../../uploads/noObsDetailsObj.js`, JSON.stringify(noDetailsBuildArr), function(err) {
         //     if(err) {
@@ -457,13 +499,13 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // }); 
 
 
-        fs.writeFileSync(__dirname +`/../../uploads/noFilterObj.js`, JSON.stringify(noFilterBuildArr), function(err) {
-            if(err) {
-                return console.log(err);
-            }
+        // fs.writeFileSync(__dirname +`/../../uploads/noFilterObj.js`, JSON.stringify(noFilterBuildArr), function(err) {
+        //     if(err) {
+        //         return console.log(err);
+        //     }
         
-            console.log("The file was saved!");
-        }); 
+        //     console.log("The file was saved!");
+        // }); 
 
 
         console.log("despues de escribir archivos")
