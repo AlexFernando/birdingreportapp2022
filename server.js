@@ -45,6 +45,101 @@ app.post('/upload', (req, res) => {
     })
 });
 
+
+app.post('/updatepersonaldata', (req, res) => {
+    
+  if (req.files === null) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+  }
+  
+  const file = req.files.file;
+
+  file.mv(`${__dirname}/updatesfiles/personaldata/personalData.csv`, err => {
+      
+      if (err) {
+          console.error(err);
+          return res.status(500).send(err)
+      }
+      res.json({ fileName: file.name, filePath: `/updatesfiles/personaldata/personalData.csv` });
+  })
+});
+
+
+app.post('/updatemaindata', (req, res) => {
+    
+  if (req.files === null) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+  }
+  
+  const file = req.files.file;
+
+  file.mv(`${__dirname}/updatesfiles/maindata/mainData.xlsx`, err => {
+      
+      if (err) {
+          console.error(err);
+          return res.status(500).send(err)
+      }
+      res.json({ fileName: file.name, filePath: `/updatesfiles/maindata/mainData.xlsx` });
+  })
+});
+
+
+app.post('/updaterestrictiondata', (req, res) => {
+    
+  if (req.files === null) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+  }
+  
+  const file = req.files.file;
+
+  file.mv(`${__dirname}/updatesfiles/restrictiondata/RestrictionData.xlsx`, err => {
+      
+      if (err) {
+          console.error(err);
+          return res.status(500).send(err)
+      }
+      res.json({ fileName: file.name, filePath: `/updatesfiles/restrictiondata/RestrictionData.xlsx` });
+  })
+});
+
+app.post('/updatepresencendata', (req, res) => {
+    
+  if (req.files === null) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+  }
+  
+  const file = req.files.file;
+
+  file.mv(`${__dirname}/updatesfiles/presencedata/presenceData.xlsx`, err => {
+      
+      if (err) {
+          console.error(err);
+          return res.status(500).send(err)
+      }
+      res.json({ fileName: file.name, filePath: `/updatesfiles/presencedata/presenceData.xlsx` });
+  })
+});
+
+app.post('/updateconservationdata', (req, res) => {
+    
+  if (req.files === null) {
+      return res.status(400).json({ msg: 'No file uploaded' });
+  }
+  
+  const file = req.files.file;
+
+  file.mv(`${__dirname}/updatesfiles/conservationdata/conservationData.xlsx`, err => {
+      
+      if (err) {
+          console.error(err);
+          return res.status(500).send(err)
+      }
+      res.json({ fileName: file.name, filePath: `/updatesfiles/conservationdata/conservationData.xlsx` });
+  })
+});
+
+
+
 //este post para recibir el dato 
 app.post('/dates', (req, res) => {
   const myDates = req.body.myDates;
