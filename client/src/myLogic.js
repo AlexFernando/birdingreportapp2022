@@ -1,10 +1,10 @@
 
-const { Console } = require('console');
+// const { Console } = require('console');
 const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG, SSL_OP_CIPHER_SERVER_PREFERENCE } = require('constants');
 const e = require('cors');
 const csv = require('csv-parser');
 const fs = require('fs')
-const officegen = require('officegen');
+// const officegen = require('officegen');
 const {reverseString} = require('./helpers.js/reverseDates')
 const {formatDates, formatTimes} = require('./helpers.js/formatDates')
 
@@ -24,6 +24,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let excelFindMissedBird = require('./excelFindMissedBird') // whole list world
     let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
     let excelConservationCodes = require('./excelConservationCode')//Conservation Code
+
+    console.log("filename: ", filename)
 
     let filenameUploaded = filename; 
     
@@ -99,19 +101,19 @@ function mySpecialFunction(initialDate, endDate, filename) {
         //take only some properties of the object to write to .docx
 
         // Create an empty Word object:
-        let docx = officegen('docx')
+        // let docx = officegen('docx')
     
         // Officegen calling this function after finishing to generate the docx document:
-        docx.on('finalize', function(written) {
-            console.log(
-                'Finish to create a Microsoft Word document.'
-            )
-        })
+        // docx.on('finalize', function(written) {
+        //     console.log(
+        //         'Finish to create a Microsoft Word document.'
+        //     )
+        // })
     
         // Officegen calling this function to report errors:
-        docx.on('error', function(err) {
-            console.log(err)
-        })
+        // docx.on('error', function(err) {
+        //     console.log(err)
+        // })
     
         let objectFormat = {};
         let oldTestVar = '';
@@ -147,7 +149,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
 
         //AUDIO RECORDED ARR
-            let arrAudioRecorded = cleanKeys.filter(elem => elem['Observation Details'].toLowerCase().includes('audio recorded'))
+            // let arrAudioRecorded = cleanKeys.filter(elem => elem['Observation Details'].toLowerCase().includes('audio recorded'))
+            // arrAudioRecorded.map(elem => console.log(elem))
+            // console.log("audio recorded lenght: ", arrAudioRecorded.length)
         //AUDIO RECORDED ARR ENDS
 
 
@@ -204,7 +208,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             arrSpeciesNoFilter.push(objNoFilter);
   
             // console.log(elem);
-            if( (!elem['Observation Details'].toLowerCase().includes('Glimpsed'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) ) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
+            if( (!elem['Observation Details'].toLowerCase().includes('Glimpsed'.toLowerCase()) && !elem['Observation Details'].toLowerCase().includes('Sighting'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) ) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
                 
                 if(elem['Observation Details'].match(subSpecieRegex)){
                     let sspElem = elem['Observation Details'].match(subSpecieRegex);
@@ -311,6 +315,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         // console.log("arrHeardSpecies: ", arrHeardSpecies);
 
+        //AUDIO RECORDED 
+         let audioRecordedHeard = arrHeardSpecies.filter(elem => elem['Comments'].toLowerCase().includes('audio recorded'))
+         let audioRecordedHeardSeen = arrHeardSeenSpecies.filter(elem => elem['Comments'].toLowerCase().includes('audio recorded'))
+         let audioRecordedSeen = arrSpecies.filter(elem => elem['Comments'].toLowerCase().includes('audio recorded'))
+
+         let arrAudioRecordedTotal = audioRecordedHeard.concat(audioRecordedHeardSeen, audioRecordedSeen)
+        //END AUDIO RECORDED
+
+        console.log("audioRecorded: ", arrAudioRecordedTotal.length);
+
         //GET GLIMPSED SPECIES
         let arrHeardGlimpsedSpecies = arrHeardSeenSpecies.filter(elem => {
             if(elem['Comments'].toLowerCase().includes('glimpsed')){
@@ -337,7 +351,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         console.log("heard: ",arrHeardSpecies.length,  "arrHeardSeenSpecies: ", arrHeardSeenSpecies.length, "arrSpecies: ", arrSpecies.length)
 
         let arrOnlyHeardSpecies = arrHeardSpecies.filter(elemOne => 
-            !arrHeardSeenPlusSeen.some(elemTwo =>  (elemOne.ScientificNameKey[0] === elemTwo.ScientificNameKey[0] || elemOne.ScientificNameKey[0].includes(elemTwo.ScientificNameKey[0]) || elemOne.ScientificNameKey[0].includes('sp.')) ));
+            !arrHeardSeenPlusSeen.some(elemTwo =>  (elemOne.ScientificNameKey[0] === elemTwo.ScientificNameKey[0] || elemOne.ScientificNameKey[0].includes(elemTwo.ScientificNameKey[0]) || elemTwo.ScientificNameKey[0].includes(elemOne.ScientificNameKey[0]) || elemOne.ScientificNameKey[0].includes('sp.')) ));
         
   
         console.log("arrOnlyHeardSpecies: ", arrOnlyHeardSpecies.length)
@@ -407,41 +421,26 @@ function mySpecialFunction(initialDate, endDate, filename) {
             delete item.CommonName;
         }) 
 
+        let audioRecordedBuildArr =  buildObjFile.buildObjData(arrAudioRecordedTotal)
         let onlyHeardSpecies = buildObjFile.buildObjData(arrOnlyHeardSpecies);
         let heardSeenBuildArr = buildObjFile.buildObjData(arrHeardSeenSpecies);
+        let heardAndGlimpsed = buildObjFile.buildObjData(arrHeardGlimpsedSpecies)
+        let glimpsedArr = buildObjFile.buildObjData(arrGlimpsedSpecies);
         let noDetailsBuildArr = buildObjFile.buildObjData(arrSpecies);
         let noFilterBuildArr = buildObjFile.buildObjData(arrSpeciesNoFilter);
 
         console.log("antes de escribir archivos")
 
         const filesToWrite = [
-            { fileName: 'onlyHeard.js', data: onlyHeardSpecies },
-            { fileName: 'allHeardSpecies.js', data: arrMergedHeardSpecies },
-            { fileName: 'heardSeenSpecies.js', data: heardSeenBuildArr },
-            { fileName: 'noObsDetailsObj.js', data: noDetailsBuildArr },
-            { fileName: 'noFilterObj.js', data: noFilterBuildArr },
+            { fileName: 'audioRecorded.jsonld', data: audioRecordedBuildArr},
+            { fileName: 'onlyHeard.jsonld', data: onlyHeardSpecies },
+            { fileName: 'allHeardSpecies.jsonld', data: arrMergedHeardSpecies },
+            { fileName: 'heardSeenSpecies.jsonld', data: heardSeenBuildArr },
+            { fileName: 'heardAndGlimpsed.jsonld', data: heardAndGlimpsed},
+            { fileName: 'glimpsed.jsonld', data: glimpsedArr},
+            { fileName: 'noObsDetailsObj.jsonld', data: noDetailsBuildArr },
+            { fileName: 'noFilterObj.jsonld', data: noFilterBuildArr },
         ];
-
-
-// const writeFiles = (filesToWrite, uploadsDir) => {
-//   async.eachSeries(filesToWrite, (file, callback) => {
-//     const filePath = path.join(uploadsDir, file.fileName);
-//     fs.writeFile(filePath, JSON.stringify(file.data), (err) => {
-//       if (err) {
-//         console.log(`Error writing file ${file.fileName}: ${err.message}`);
-//       } else {
-//         console.log(`File ${file.fileName} written successfully`);
-//       }
-//       callback(err);
-//     });
-//   }, (err) => {
-//     if (err) {
-//       console.log(`Error writing files: ${err.message}`);
-//     } else {
-//       console.log('All files written successfully');
-//     }
-//   });
-// };
 
 
 
@@ -462,94 +461,7 @@ const writeFiles = (filesToWrite, uploadsDir) => {
   };
   
   const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
-writeFiles(filesToWrite, uploadsDir);
-
-
-        // const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
-
-        // filesToWrite.forEach((file) => {
-
-        //     const filePath = path.join(uploadsDir, file.fileName);
-
-        //     fs.writeFileSync(__dirname +`/../../uploads/${file.fileName}`, JSON.stringify(file.data), function(err) {
-        //         if(err) {
-        //             return console.log(err);
-        //         }
-
-        //         console.log("The file was saved!");
-        //     }); 
-    
-        // });
-
-        // async function writeFiles(filesToWrite) {
-        //     const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
-          
-        //     for (const file of filesToWrite) {
-        //       const filePath = path.join(uploadsDir, file.fileName);
-        //       try {
-        //         await fs.promises.writeFile(filePath, JSON.stringify(file.data));
-        //         console.log(`${file.fileName} was saved`);
-        //       } catch (err) {
-        //         console.error('Error writing file:', err);
-        //       }
-        //     }
-        //   }
-          
-        //   writeFiles(filesToWrite);
-
-        // const data = 'Hello, world!';
-
-        // try {
-        //   fs.writeFileSync('myexample.js', data);
-        //   console.log('File written successfully!');
-        // } catch (err) {
-        //   console.error('Error writing file:', err);
-        // }
-
-        // fs.writeFileSync(__dirname +`/../../uploads/onlyHeard.js`, JSON.stringify(onlyHeardSpecies), function(err) {
-        //     console.log("entramos a escribir archivos")
-        //     if(err) {
-        //         return console.log(err);
-        //     }
-        
-        //     console.log("The file was saved!");
-        // }); 
-
-
-        // fs.writeFileSync(__dirname +`/../../uploads/allHeardSpecies.js`, JSON.stringify(arrMergedHeardSpecies), function(err) {
-        //     if(err) {
-        //         return console.log(err);
-        //     }
-        
-        //     console.log("The file was saved!");
-        // }); 
-        
-
-
-        // fs.writeFileSync(__dirname +`/../../uploads/heardSeenSpecies.js`, JSON.stringify(heardSeenBuildArr), function(err) {
-        //     if(err) {
-        //         return console.log(err);
-        //     }
-        
-        //     console.log("The file was saved!");
-        // }); 
-
-        // fs.writeFileSync(__dirname +`/../../uploads/noObsDetailsObj.js`, JSON.stringify(noDetailsBuildArr), function(err) {
-        //     if(err) {
-        //         return console.log(err);
-        //     }
-        
-        //     console.log("The file was saved!");
-        // }); 
-
-
-        // fs.writeFileSync(__dirname +`/../../uploads/noFilterObj.js`, JSON.stringify(noFilterBuildArr), function(err) {
-        //     if(err) {
-        //         return console.log(err);
-        //     }
-        
-        //     console.log("The file was saved!");
-        // }); 
+writeFiles(filesToWrite, path.join(__dirname, './components/uploadedFiles'));
 
 
         console.log("despues de escribir archivos")
@@ -1727,14 +1639,14 @@ writeFiles(filesToWrite, uploadsDir);
         // pObj1.addLineBreak()
 
     
-        let out = fs.createWriteStream('Report.docx')
+        // let out = fs.createWriteStream('Report.docx')
     
-        out.on('error', function(err) {
-            console.log(err)
-        })
+        // out.on('error', function(err) {
+        //     console.log(err)
+        // })
     
         // Async call to generate the output file:
-        docx.generate(out)
+        // docx.generate(out)
     
         return filteredData;
     }
@@ -1762,5 +1674,3 @@ writeFiles(filesToWrite, uploadsDir);
 module.exports = {
     mySpecialFunction: mySpecialFunction,
 };
-
-

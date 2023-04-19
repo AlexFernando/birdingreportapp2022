@@ -3,10 +3,18 @@ import React, {useState , useEffect} from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import allSpecies from './allSpecies.json'
-import onlyHeardData from './onlyHeard.json'
+import audioRecordedJson from './uploadedFiles/audioRecorded.jsonld'
+import onlyHeardDataJson from './uploadedFiles/onlyHeard.jsonld'
 import heardData from './MyHeardSpecies.json'
+import heardDataJson from './uploadedFiles/allHeardSpecies.jsonld'
+import heardGlimplsedJson from './uploadedFiles/heardAndGlimpsed.jsonld'
+import glimpsedJson from './uploadedFiles/glimpsed.jsonld'
 import heardSeenData from './MyHeardSeenSpecies.json'
+import heardSeenJson from './uploadedFiles/heardSeenSpecies.jsonld'
 import noObsDetailsData from './noObsDetailsSpecies.json'
+import seenJson from './uploadedFiles/noObsDetailsObj.jsonld'
+import noFilterJson from './uploadedFiles/noFilterObj.jsonld'
+
 import regionData from './regions.json'
 import styled, { css } from 'styled-components'
 
@@ -33,32 +41,92 @@ let CountryOptions = [
   {value: "EC-" , label: "Ecuador"}
 ]
 
-// const dataMixArr = noObsDetailsData.concat(heardSeenData);
-
-//  const filteredObjects = data.filter(obj => {
-//   return obj.ScientificNameKey.some(innerObj => {
-//     return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
-//                    .some(otherInnerObj => otherInnerObj.name === innerObj.name);
-//   });
-// });
-
-// const filteredData = data.map(obj => {
-//   const filteredScientificNameKey = obj.ScientificNameKey.filter(innerObj => {
-//     return !dataMixArr.flatMap(otherObj => otherObj.ScientificNameKey)
-//                    .some(otherInnerObj => otherInnerObj.name === innerObj.name);
-//   }).map(filteredObj => {
-//     return { name: filteredObj.name, value: filteredObj.value, CommonName: filteredObj.CommonName };
-//   });
-//   return { LocationHeardKey: obj.LocationHeardKey, ScientificNameKey: filteredScientificNameKey, Region: obj.Region };
-// });
-
-// console.log("buena data: ", filteredData);
-
 const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
 
-    console.log("heardData: ", heardData);
-    console.log("heardSeenData: ", heardSeenData);
-    console.log("Seen data", noObsDetailsData)
+  const [audioRecordedData, setAudioRecordedData] = useState([])
+  const [onlyHeardData, setOnlyHeardData] = useState([]);
+  const [allHeardDataJson, setAllHeardDataJson] = useState([]);
+  const [heardAndGlimpsedJson, setHeardAndGlimpsedJson ] = useState([]);
+  const [onlyGlimpsedJson, setOnlyGlimpsedJson] = useState([])
+  const [heardAndSeenJson, setHeardAndSeenJson] = useState([])
+  const [onlySeen, setOnlySeen] = useState([])
+  const [noFilter, setNoFilter] = useState([])
+
+
+  useEffect(() => {
+    async function fetchDataZero() {
+      const response = await fetch(audioRecordedJson);
+      const data = await response.json();
+      setAudioRecordedData(data);
+    }
+
+    fetchDataZero();
+
+    async function fetchData() {
+      const response = await fetch(onlyHeardDataJson);
+      const data = await response.json();
+      setOnlyHeardData(data);
+    }
+
+    fetchData();
+
+    async function fetchDataOne() {
+      const response = await fetch(heardDataJson);
+      const data = await response.json();
+      setAllHeardDataJson(data);
+    }
+
+    fetchDataOne();
+
+    async function fetchDataTwo() {
+      const response = await fetch(heardGlimplsedJson);
+      const data = await response.json();
+      setHeardAndGlimpsedJson(data);
+    }
+
+    fetchDataTwo();
+
+    async function fetchDataThree() {
+      const response = await fetch(glimpsedJson);
+      const data = await response.json();
+      setOnlyGlimpsedJson(data);
+    }
+
+    fetchDataThree();
+
+    async function fetchDataFour() {
+      const response = await fetch(heardSeenJson);
+      const data = await response.json();
+      setHeardAndSeenJson(data);
+    }
+
+    fetchDataFour();
+
+    async function fetchDataFive() {
+      const response = await fetch(seenJson);
+      const data = await response.json();
+      setOnlySeen(data);
+    }
+
+    fetchDataFive();
+
+    async function fetchDataSix() {
+      const response = await fetch(noFilterJson);
+      const data = await response.json();
+      setNoFilter(data);
+    }
+
+    fetchDataSix();
+  }, []);
+
+    console.log("audio recorded", audioRecordedData)
+    console.log("onlyHeard: ", onlyHeardData);
+    console.log("allheard: ", allHeardDataJson);
+    console.log("heard and glimpsed: ", heardAndGlimpsedJson);
+    console.log("Glimpsed: ", onlyGlimpsedJson);
+    console.log("heard seen: ", heardAndSeenJson)
+    console.log("seen: ", onlySeen)
+    console.log("noFilter: ", noFilter)
 
     const [userChoiceCountry, setUserChoiceCountry] = useState([])
 
@@ -111,37 +179,57 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
     const handleFilterOptionClick = (option) => {
     
         switch (option) {
+          case 'Audio Recorded':
+            console.log("userChoice Audio Recorded: ", userChoice)
+            setFilterOptions(audioRecordedData)
+            const updatedChoices = handleChoicesOnFilterOption(userChoice, audioRecordedData);
+            setUserChoice(updatedChoices)
+            setTagFilterData("Audio Recorded")
+            break;
           case 'Only Heard':
             console.log("userChoice Heard Data: ", userChoice)
             setFilterOptions(onlyHeardData)
-            const updatedChoices = handleChoicesOnFilterOption(userChoice, onlyHeardData);
-            setUserChoice(updatedChoices)
+            const updatedChoicesOne = handleChoicesOnFilterOption(userChoice, onlyHeardData);
+            setUserChoice(updatedChoicesOne)
             setTagFilterData("Only Heard")
             break;
-
+          
           case 'Heard Included': 
-            setFilterOptions(heardData)
-            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, heardData);
+            setFilterOptions(allHeardDataJson)
+            const updatedChoicesSecond = handleChoicesOnFilterOption(userChoice, allHeardDataJson);
             setUserChoice(updatedChoicesSecond)
             setTagFilterData("Heard Included")
              break;
 
           case 'Heard and Seen':
-            setFilterOptions(heardSeenData)
-            const updatedChoicesThird = handleChoicesOnFilterOption(userChoice, heardSeenData);
+            setFilterOptions(heardAndSeenJson)
+            const updatedChoicesThird = handleChoicesOnFilterOption(userChoice, heardAndSeenJson);
             setUserChoice(updatedChoicesThird)
             setTagFilterData("Heard and Seen")
             break;
-          case 'Only Seen':
-            setFilterOptions(noObsDetailsData)
-            const updatedChoicesFour = handleChoicesOnFilterOption(userChoice, noObsDetailsData);
+
+          case 'Heard and Glimpsed':
+            setFilterOptions(heardAndGlimpsedJson)
+            const updatedChoicesFour = handleChoicesOnFilterOption(userChoice, heardAndGlimpsedJson);
             setUserChoice(updatedChoicesFour)
+            setTagFilterData("Heard and Glimpsed")
+            break;
+          case 'Glimpsed':
+            setFilterOptions(onlyGlimpsedJson)
+            const updatedChoicesFive = handleChoicesOnFilterOption(userChoice, onlyGlimpsedJson);
+            setUserChoice(updatedChoicesFive)
+            setTagFilterData("Glimpsed")
+            break;
+          case 'Only Seen':
+            setFilterOptions(onlySeen)
+            const updatedChoicesSix = handleChoicesOnFilterOption(userChoice, onlySeen);
+            setUserChoice(updatedChoicesSix)
             setTagFilterData("Seen - (Not relevant Obs. Details)")
             break;
           case 'All Type of Obervations':
-            setFilterOptions(allSpecies)
-            const updatedChoicesFive = handleChoicesOnFilterOption(userChoice, allSpecies);
-            setUserChoice(updatedChoicesFive)
+            setFilterOptions(noFilter)
+            const updatedChoicesSeven = handleChoicesOnFilterOption(userChoice, noFilter);
+            setUserChoice(updatedChoicesSeven)
             setTagFilterData("All Types of Observations")
             break;
           default:
@@ -339,11 +427,14 @@ const AnimatedMulti = ({getSpecies, getSpeciesSum}) => {
             id="dropdown-variants"
             title="Filter By"
         >
-            <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Only Heard')} >Only Heard</Dropdown.Item>
-            <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Heard Included')} >Heard Included</Dropdown.Item>
-            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Heard and Seen')} >Heard and Seen</Dropdown.Item>
-            <Dropdown.Item eventKey="3" onClick={() => handleFilterOptionClick('Only Seen')} >Only Seen</Dropdown.Item>
-            <Dropdown.Item eventKey="4" onClick={() => handleFilterOptionClick('All Type of Obervations')} >All Type Of Observations</Dropdown.Item>
+            <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Audio Recorded')} >Audio Recorded</Dropdown.Item>
+            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Only Heard')} >Only Heard</Dropdown.Item>
+            <Dropdown.Item eventKey="3" onClick={() => handleFilterOptionClick('Heard Included')} >Heard Included</Dropdown.Item>
+            <Dropdown.Item eventKey="4" onClick={() => handleFilterOptionClick('Heard and Glimpsed')} >Heard and Glimpsed</Dropdown.Item>
+            <Dropdown.Item eventKey="5" onClick={() => handleFilterOptionClick('Glimpsed')} >Glimpsed</Dropdown.Item>
+            <Dropdown.Item eventKey="6" onClick={() => handleFilterOptionClick('Heard and Seen')} >Heard and Seen</Dropdown.Item>
+            <Dropdown.Item eventKey="7" onClick={() => handleFilterOptionClick('Only Seen')} >Only Seen</Dropdown.Item>
+            <Dropdown.Item eventKey="8" onClick={() => handleFilterOptionClick('All Type of Obervations')} >All Type Of Observations</Dropdown.Item>
     
         </DropdownButton>
 
