@@ -1,15 +1,18 @@
 import React, {useState, useEffect, useLayoutEffect} from "react";
-import AnimatedMulti from './SearchBoxLocationsAlternative'
+import AnimatedMulti from './SearchBoxLocations'
 import styled, { css } from 'styled-components'
 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import {Button } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import axios from 'axios';
+
+import MyForm from './ModalForm'
 
 //In another component you need to get the array of audio recorded birds, filter that from obs.details, then you need to get the data  
 //(don't forget the code) required and build the link with the coe
@@ -19,31 +22,36 @@ const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 const StatisticsComponent = () => {
 
     const [speciesList, setSpeciesList] = useState([]);
+    const [seasonSpeciesList, setSeasonSpeciesList] = useState([])
     const [speciesSum, setSpeciesSum] = useState(0);
     const [tagFilter, setTagFilter] = useState(''); 
     const [genereated, setGenerated] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("");
 
     const getSpecies = (data) => {
         setSpeciesList(data)
         setTagFilter('')
     }
 
-    const getSpeciesSum = (sum) => {
-        setSpeciesSum(sum);
-    }
+    // const getSpeciesSum = (sum) => {
+    //     setSpeciesSum(sum);
+    // }
 
     const handleDescendingOrder = () => {
-        setSpeciesList([...speciesList].sort((a,b) => b.valuePercentage - a.valuePercentage))
-        setTagFilter('Descending Percentage')
+        setSpeciesList([...speciesList].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
+        setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
+        setTagFilter('Descending Taxonomic Order')
     }
     
     const handleAscendingOrder = () => {
-        setSpeciesList([...speciesList].sort((a,b) => a.valuePercentage - b.valuePercentage))
-        setTagFilter('Ascending Percentage')
+        setSpeciesList([...speciesList].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
+        setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
+        setTagFilter('Ascending Taxonomic Order')
     }
 
     const handleAlphabeticOrder = () => {
-        setSpeciesList([...speciesList].sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)))
+        setSpeciesList([...speciesList].sort((a,b) => (a.ScientificNameKey > b.ScientificNameKey) ? 1 : ((b.ScientificNameKey > a.ScientificNameKey) ? -1 : 0)))
+        setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => (a.ScientificNameKey > b.ScientificNameKey) ? 1 : ((b.ScientificNameKey > a.ScientificNameKey) ? -1 : 0)))
         setTagFilter('Alphabetic Order')
     }
 
@@ -60,21 +68,27 @@ const StatisticsComponent = () => {
         const res =  await axios.post('/writestats', {myStats: speciesList})
         .then(res => console.log("res.data: ", res.data))
         .catch(err => console.log(err.data))
-    
-     
+
         }  
         sendSpeciesList()
 
         setGenerated(true)
   }
- 
-    return(
+
+  const handleResetDates = () => {
+    setSeasonSpeciesList([])
+  }
+
+
+     return(
         <Container>
             <Title>Statistics</Title>
             
             <SearchBarContainer>
-                <AnimatedMulti getSpecies = {getSpecies} getSpeciesSum={getSpeciesSum} />
+                <AnimatedMulti getSpecies = {getSpecies} />
             </SearchBarContainer>
+
+         
 
             <FilterContainer>            
                 <DropdownButton
@@ -83,8 +97,8 @@ const StatisticsComponent = () => {
                     id="dropdown-variants"
                     title="Order By"
                 >
-                    <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Descending %</Dropdown.Item>
-                    <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Ascending %</Dropdown.Item>
+                    <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Descending Taxonomic Order</Dropdown.Item>
+                    <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Ascending Taxonomic Order</Dropdown.Item>
                     <Dropdown.Item eventKey="3" onClick = {handleAlphabeticOrder}>Alphabetic</Dropdown.Item>
             
                 </DropdownButton>
@@ -92,41 +106,101 @@ const StatisticsComponent = () => {
                 <p><span>{check}</span>{tagFilter}</p>
             </FilterContainer>
 
+         
+                <MyForm speciesListAll={speciesList}  setSeasonSpeciesList={setSeasonSpeciesList}/>
+
+                <Button className="ml-2" variant="primary" type="submit"  onClick={handleResetDates}>
+                    Reset Dates
+                </Button>
+        
+
             <TableContainer>
-                <TableTag>
+                <TableTag className="table table-responsive-md">
                     {
                         speciesList.length === 0 ? <div><span>No stats to show, yet. You may choose a Hotspot</span></div>
                     
                     :
                     <tbody>
                         <TextTable>
-                            <th>Nº</th>
+
                             <th>Scientific Name</th>
-                            <th>English Name</th>
-                            <th>Frequency</th>
-                            <th>Percentage Frequency</th>
+                            <th>Common Name</th>
+                            <th>Register Date</th>
+                            <th>Count</th>
+                            <th>Location Hotspot</th>
+                            <th>Nº Tax.</th>
                         </TextTable>
+
                         {
+                            seasonSpeciesList.length>0 ? 
+                                seasonSpeciesList.map((elem, idx) => {
+                                    if (elem) {
+    
+                                        return(
+                                  
+                                            <TextTable key={idx}>
 
-                            speciesList.length>0 && speciesList.map((elem, idx) => {
-                                if( elem && elem.name ){
-                                    return(
-                                        <TextTable>
-                                            <td><span>{idx+1}</span></td>
-                                            <TextColumn>{elem['name']}</TextColumn>
-                                            <TextColumn>{elem['CommonName']}</TextColumn>
-                                            <td>{elem['value']}</td>
-                                            <td>{elem['valuePercentage']}%</td>
-                                        </TextTable>
-                                    )
+                                                <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
+                                                <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                {
+                                                        elem['SubmissionID'] !== undefined? 
+                                                            <TextColumn>
+                                                                <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
+                                                                    {elem['MyDate']}
+                                                                </a>
+                                                            </TextColumn>
+                                                        :
 
-                                }
-                       
-                            })
+                                                        <TextColumn>{elem['MyDate']}</TextColumn>
+                                                    }
+                                                <TextColumn>{elem['Count']}</TextColumn>
+                                                <TextColumn>{elem['Location']}</TextColumn>
+                                                <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                            </TextTable>
+                                        )
+                                    }
+                                })
 
+                                
+
+                                :
+                 
+                                    speciesList.length>0 && speciesList.map((elem, idx) => {
+                                        if (elem) {
+        
+                                            return(
+                                      
+                                                <TextTable key={idx}>
+
+                                                    <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
+                                                    <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                    {
+                                                        elem['SubmissionID'] !== undefined? 
+                                                            <TextColumn>
+                                                                <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
+                                                                    {elem['MyDate']}
+                                                                </a>
+                                                            </TextColumn>
+                                                        :
+
+                                                        <TextColumn>{elem['MyDate']}</TextColumn>
+                                                    }
+
+                                                    <TextColumn>{elem['Count']}</TextColumn>
+                                                    <TextColumn>{elem['Location']}</TextColumn>
+                                                    <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                                </TextTable>
+                                            )
+                                        }
+                                    })
+                                
                         }
+                            
+     
+                        
+                        
+         
                     </tbody>
-
                     }   
                 </TableTag>
 
@@ -162,6 +236,11 @@ const Container = styled.div`
     padding-left: calc(4rem);
     padding-right: calc(4rem);
     line-height: 1.5;
+
+    @media (max-width: 768px){
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
 `
 
 const Title = styled.h1`
@@ -187,6 +266,10 @@ export const FilterContainer = styled.div`
         font-weight: 500;
     }
 `
+const ButtonGroupDates = styled.div`
+    display: flex;
+    justify-content: space-evenly;
+`
 
 const TableContainer = styled.div`
     margin-top: calc(2rem);
@@ -195,11 +278,23 @@ const TableContainer = styled.div`
 const TableTag = styled.table`
    width: 100%;
 `
+
 const TextTable = styled.tr`
-    text-align: center;
-    border:1px solid black;
+    
 `
 
 const TextColumn = styled.td`
-    text-align: justify;
+    a {
+        text-decoration: none;
+        color: #000;
+    }
+`
+
+const TextColumnAlternative = styled.td`
+  
+`
+
+const DateYearSelect = styled.div`
+    display: flex;
+    justify-content: space-evenly;
 `

@@ -35,17 +35,22 @@ function writeStatsFunc(objData) {
 
     // The direct option - two-dimensional array:
     sheet.data[0] = []
-    sheet.data[0][0] = 'Scientific Name'
-    sheet.data[0][1] = 'CommonName'
-    sheet.data[0][2] = 'Absolute Frequency'
-    sheet.data[0][3] = 'Relative Frequency %'
+    sheet.data[0][0] = 'Nº'
+    sheet.data[0][1] = 'Scientific Name'
+    sheet.data[0][2] = 'Common Name'
+    sheet.data[0][3] = 'Date'
+    sheet.data[0][3] = 'Count'
+    sheet.data[0][3] = 'Location'
+    
 
     objData.map( (elem, idx) => {
         sheet.data[idx+1] = []
-        sheet.data[idx+1][0] = elem['name']
-        sheet.data[idx+1][1] = elem['CommonName']
-        sheet.data[idx+1][2] = elem['value']
-        sheet.data[idx+1][3] = elem['valuePercentage']
+        sheet.data[idx+1][0] = elem['TaxonomicOrder']
+        sheet.data[idx+1][1] = elem['Scientific Name']
+        sheet.data[idx+1][2] = elem['CommonName']
+        sheet.data[idx+1][3] = elem['Date']
+        sheet.data[idx+1][3] = elem['Count']
+        sheet.data[idx+1][3] = elem['Location']
 
     })
 

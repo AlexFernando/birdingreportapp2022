@@ -16,19 +16,34 @@ function buildObjData(arrHeardSpecies) {
             if (occurs >= 0) {
 
                 // append the current value to its list of values.
-                accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
-                accumulator[occurs].CommonName = accumulator[occurs].CommonName.concat(curr.CommonName);
-                // Otherwise,
+                   // If the location is already in the array, push the scientific and common name to its nested array.
+              accumulator[occurs].species.push({
+                ScientificNameKey: curr.ScientificNameKey,
+                CommonName: curr.CommonName,
+                MyDate: curr.Date,
+                Count: curr.CountNew,
+                TaxonomicOrder: curr.TaxonomicOrder,
+                Location: curr.LocationHeardKey
+              });
             } else {
 
                 // add the current item to o (but make sure the value is an array).
-                let obj = {
-                    LocationHeardKey: curr.LocationHeardKey,
+                        // Otherwise, add a new object to the array.
+              let obj = {
+                LocationHeardKey: curr.LocationHeardKey,
+                species: [
+                  {
                     ScientificNameKey: curr.ScientificNameKey,
-                    CommonName : curr.CommonName,
-                    Region : curr.Region
-                };
-                accumulator = accumulator.concat([obj]);
+                    CommonName: curr.CommonName,
+                    MyDate: curr.Date,
+                    Count: curr.CountNew,
+                    TaxonomicOrder: curr.TaxonomicOrder,
+                    Location: curr.LocationHeardKey
+                  },
+                ],
+                Region: curr.Region,
+              };
+              accumulator.push(obj);
             }
 
             return accumulator;
@@ -36,35 +51,35 @@ function buildObjData(arrHeardSpecies) {
 
         // console.log(arrMergedHeardSpecies);
 
-        arrMergedHeardSpecies.map( objElem => {            
-            let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx] }))
+        // arrMergedHeardSpecies.map( objElem => {            
+        //     let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx] }))
 
-            objElem.ScientificNameKey = ocurrences;
-        })
+        //     objElem.ScientificNameKey = ocurrences;
+        // })
 
-        arrMergedHeardSpecies.map( item => {
-            let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
-                const index = acc.findIndex(singleObj => {
-                    return singleObj["name"] === curr["name"]
-                });
+        // arrMergedHeardSpecies.map( item => {
+        //     let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
+        //         const index = acc.findIndex(singleObj => {
+        //             return singleObj["name"] === curr["name"]
+        //         });
     
-                if (index >= 0) {
-                    var originalValue = acc[index]["value"];
-                    originalValue += curr["value"];
-                    acc[index]["value"] = originalValue;
-                }  
+        //         if (index >= 0) {
+        //             var originalValue = acc[index]["value"];
+        //             originalValue += curr["value"];
+        //             acc[index]["value"] = originalValue;
+        //         }  
     
-                else {
-                    acc.push(curr);
-                }
+        //         else {
+        //             acc.push(curr);
+        //         }
             
-                return acc;
-            }, []);
+        //         return acc;
+        //     }, []);
 
-            item.ScientificNameKey = newMergedHeardSpecies
+        //     item.ScientificNameKey = newMergedHeardSpecies
 
-            delete item.CommonName;
-        }) 
+        //     delete item.CommonName;
+        // }) 
 
         return arrMergedHeardSpecies;
 

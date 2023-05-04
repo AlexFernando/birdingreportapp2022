@@ -4,7 +4,7 @@ const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG, SSL_OP_CIPHER_SERVER_PREFERENCE } = req
 const e = require('cors');
 const csv = require('csv-parser');
 const fs = require('fs')
-// const officegen = require('officegen');
+const officegen = require('officegen');
 const {reverseString} = require('./helpers.js/reverseDates')
 const {formatDates, formatTimes} = require('./helpers.js/formatDates')
 
@@ -24,6 +24,17 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let excelFindMissedBird = require('./excelFindMissedBird') // whole list world
     let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
     let excelConservationCodes = require('./excelConservationCode')//Conservation Code
+
+let excelCountryCodes = require('./codigoPaises') //countrycode
+
+let CountryCodeData = excelCountryCodes.codigoPaisesResults();
+
+    const arrNewCountryCode = CountryCodeData.map(elem => {
+        let FirstKey = elem['Sate/Province Name'] + ' '+ '('+elem['Country Name'] + ')'
+        let SecondKey = elem['Country Code']+'-'+ elem['State/Province Code'];
+
+        return  {"State/Province_name":FirstKey, "code": SecondKey}
+    })
 
     console.log("filename: ", filename)
 
@@ -133,7 +144,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 elem['Observation Details'] = 'No';        
             }
            
-            const allowed = ['Common Name', 'Scientific Name', 'Location', 'Observation Details', 'Date', 'Time', 'State/Province'];
+            const allowed = ['Submission ID','Common Name', 'Scientific Name', 'Location', 'Observation Details', 'Date', 'Time', 'State/Province', 'Count', 'Taxonomic Order'];
     
             const filtered = Object.keys(elem)
                 .filter(key => allowed.includes(key))
@@ -201,15 +212,24 @@ function mySpecialFunction(initialDate, endDate, filename) {
             let objNoFilter = {}
 
             objNoFilter['LocationHeardKey'] = elem['Location'];
-            objNoFilter['ScientificNameKey'] = [elem['Scientific Name']];
-            objNoFilter['CommonName'] = [elem['Common Name']];
-            objNoFilter['Region'] = elem['State/Province'] 
+            objNoFilter['ScientificNameKey'] = elem['Scientific Name'];
+            objNoFilter['CommonName'] = elem['Common Name'];
+            objNoFilter['Region'] = elem['State/Province'];
+            objNoFilter['Comments'] = elem['Observation Details'];
+            objNoFilter['CountNew'] = elem['Count']
+            objNoFilter['TaxonomicOrder'] = elem['Taxonomic Order']
+            objNoFilter['Date'] = elem['Date'];
 
             arrSpeciesNoFilter.push(objNoFilter);
   
             // console.log(elem);
             if( (!elem['Observation Details'].toLowerCase().includes('Glimpsed'.toLowerCase()) && !elem['Observation Details'].toLowerCase().includes('Sighting'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) ) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
-                
+                let objHeardSpecies = {}
+                objHeardSpecies['Date'] = elem['Date'];
+                /**AGREGAR LINEA PARA GLIMPSED AQUI */
+
+       
+
                 if(elem['Observation Details'].match(subSpecieRegex)){
                     let sspElem = elem['Observation Details'].match(subSpecieRegex);
                     elem.category = 'subspecies'
@@ -233,21 +253,22 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.Time_both = '';
                 }
 
-                let objHeardSpecies = {}
-
                 objHeardSpecies['LocationHeardKey'] = elem['Location_heard'];
-                objHeardSpecies['ScientificNameKey'] = [elem['Scientific Name']];
-                objHeardSpecies['CommonName'] = [elem['Common Name']];
+                objHeardSpecies['ScientificNameKey'] = elem['Scientific Name'];
+                objHeardSpecies['CommonName'] = elem['Common Name'];
                 objHeardSpecies['Region'] = elem['State/Province'];
                 objHeardSpecies['Comments'] = elem['Observation Details'];
-                /**AGREGAR LINEA PARA GLIMPSED AQUI */
-
+                objHeardSpecies['CountNew'] = elem['Count']
+                objHeardSpecies['TaxonomicOrder'] = elem['Taxonomic Order'];
+                objHeardSpecies['Submission ID'] = elem['Submission ID'];
                 arrHeardSpecies.push(objHeardSpecies);
 
                 return elem;
             }
 
             else if (elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) && (elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || elem['Observation Details'].toLowerCase().includes('Glimpsed'.toLowerCase())) ) {
+                let objHeardSeenSpecies = {}
+                objHeardSeenSpecies['Date'] = elem['Date'];
 
                 if(elem['Observation Details'].match(subSpecieRegex)){
 
@@ -257,6 +278,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspLocationBoth = elem.Location;
                     elem.sspDateBoth = elem.Date;
                     elem.sspTimeBoth = elem.Time; 
+
+                    objHeardSeenSpecies['LocationHeardKey'] = elem['Location'];
                 }
 
                 else {
@@ -271,16 +294,21 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.Location_heard = '';
                     elem.Date_heard = '';
                     elem.Time_heard = '';
+
+                    objHeardSeenSpecies['LocationHeardKey'] = elem['Location_both'];
                 }
 
 
-                let objHeardSeenSpecies = {}
+          
 
-                objHeardSeenSpecies['LocationHeardKey'] = elem['Location_both'];
-                objHeardSeenSpecies['ScientificNameKey'] = [elem['Scientific Name']];
-                objHeardSeenSpecies['CommonName'] = [elem['Common Name']];
+
+                objHeardSeenSpecies['ScientificNameKey'] = elem['Scientific Name'];
+                objHeardSeenSpecies['CommonName'] = elem['Common Name'];
                 objHeardSeenSpecies['Region'] = elem['State/Province'];
                 objHeardSeenSpecies['Comments'] = elem['Observation Details'];
+                objHeardSeenSpecies['CountNew'] = elem['Count']
+                objHeardSeenSpecies['TaxonomicOrder'] = elem['Taxonomic Order'];
+                objHeardSeenSpecies['Submission ID'] = elem['Submission ID'];
 
                 arrHeardSeenSpecies.push(objHeardSeenSpecies);
                   
@@ -288,6 +316,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
 
             else {
+                let objSpecies = {}
+                objSpecies['Date'] = elem['Date'];
 
                 if(elem['Observation Details'].match(subSpecieRegex)){
 
@@ -299,13 +329,16 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspTime = elem.Time; 
                 }
 
-                let objSpecies = {}
+               
 
                 objSpecies['LocationHeardKey'] = elem['Location'];
-                objSpecies['ScientificNameKey'] = [elem['Scientific Name']];
-                objSpecies['CommonName'] = [elem['Common Name']];
-                objSpecies['Region'] = elem['State/Province'] 
+                objSpecies['ScientificNameKey'] = elem['Scientific Name'];
+                objSpecies['CommonName'] = elem['Common Name'];
+                objSpecies['Region'] = elem['State/Province'];
                 objSpecies['Comments'] = elem['Observation Details'];
+                objSpecies['CountNew'] = elem['Count']
+                objSpecies['TaxonomicOrder'] = elem['Taxonomic Order']
+                objSpecies['Submission ID'] = elem['Submission ID'];
 
                 arrSpecies.push(objSpecies);
 
@@ -351,77 +384,149 @@ function mySpecialFunction(initialDate, endDate, filename) {
         console.log("heard: ",arrHeardSpecies.length,  "arrHeardSeenSpecies: ", arrHeardSeenSpecies.length, "arrSpecies: ", arrSpecies.length)
 
         let arrOnlyHeardSpecies = arrHeardSpecies.filter(elemOne => 
-            !arrHeardSeenPlusSeen.some(elemTwo =>  (elemOne.ScientificNameKey[0] === elemTwo.ScientificNameKey[0] || elemOne.ScientificNameKey[0].includes(elemTwo.ScientificNameKey[0]) || elemTwo.ScientificNameKey[0].includes(elemOne.ScientificNameKey[0]) || elemOne.ScientificNameKey[0].includes('sp.')) ));
+            !arrHeardSeenPlusSeen.some(elemTwo =>  (elemOne.ScientificNameKey === elemTwo.ScientificNameKey || elemOne.ScientificNameKey.includes(elemTwo.ScientificNameKey) || elemTwo.ScientificNameKey.includes(elemOne.ScientificNameKey) || elemOne.ScientificNameKey.includes('sp.')) ));
         
   
         console.log("arrOnlyHeardSpecies: ", arrOnlyHeardSpecies.length)
         // console.log("arrOnlyHeardSpecies: ", arrOnlyHeardSpecies)
 
+        // arrAudioRecordedTotal.map(elem => console.log(elem.LocationHeardKey))
+
 
         //ARRAY OF HEARD SPECIES , FOR STATITISCS
-        let arrMergedHeardSpecies  = arrHeardSpecies.reduce( (accumulator ,curr) => {
+        // let arrMergedHeardSpecies  = arrHeardSpecies.reduce( (accumulator ,curr) => {
 
-            // console.log("accum: ", accumulator, "curr: ", curr)
-         // Get the index of the key-value pair.
-            let occurs = accumulator.reduce(function(n, item, i) {
-                // console.log("n: ", n, "item: ", item, "i: ", i)
-                return (item.LocationHeardKey === curr.LocationHeardKey) ? i : n;
-            }, -1);
+        //     // console.log("accum: ", accumulator, "curr: ", curr)
+        //  // Get the index of the key-value pair.
+        //     let occurs = accumulator.reduce(function(n, item, i) {
+        //         // console.log("n: ", n, "item: ", item, "i: ", i)
+        //         return (item.LocationHeardKey === curr.LocationHeardKey) ? i : n;
+        //     }, -1);
 
-              // If the name is found,
+        //       // If the name is found,
+        //     if (occurs >= 0) {
+
+        //         // append the current value to its list of values.
+        //         accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
+        //         accumulator[occurs].CommonName = accumulator[occurs].CommonName.concat(curr.CommonName);
+        //         // Otherwise,
+        //     } else {
+
+        //         // add the current item to o (but make sure the value is an array).
+        //         let obj = {
+        //             LocationHeardKey: curr.LocationHeardKey,
+        //             ScientificNameKey: curr.ScientificNameKey,
+        //             CommonName : curr.CommonName,
+        //             Region : curr.Region,
+        //         };
+        //         accumulator = accumulator.concat([obj]);
+        //     }
+
+        //     return accumulator;
+        // }, [])
+
+        let arrMergedHeardSpecies = arrHeardSpecies.reduce((accumulator, curr) => {
+            let occurs = accumulator.findIndex((item) => item.LocationHeardKey === curr.LocationHeardKey);
             if (occurs >= 0) {
-
-                // append the current value to its list of values.
-                accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
-                accumulator[occurs].CommonName = accumulator[occurs].CommonName.concat(curr.CommonName);
-                // Otherwise,
+              // If the location is already in the array, push the scientific and common name to its nested array.
+              accumulator[occurs].species.push({
+                ScientificNameKey: curr.ScientificNameKey,
+                CommonName: curr.CommonName,
+                MyDate: curr.Date,
+                Count: curr.CountNew,
+                TaxonomicOrder: curr.TaxonomicOrder,
+                Location: curr.LocationHeardKey
+              });
             } else {
-
-                // add the current item to o (but make sure the value is an array).
-                let obj = {
-                    LocationHeardKey: curr.LocationHeardKey,
+              // Otherwise, add a new object to the array.
+              let obj = {
+                LocationHeardKey: curr.LocationHeardKey,
+                species: [
+                  {
                     ScientificNameKey: curr.ScientificNameKey,
-                    CommonName : curr.CommonName,
-                    Region : curr.Region
-                };
-                accumulator = accumulator.concat([obj]);
+                    CommonName: curr.CommonName,
+                    MyDate: curr.Date,
+                    Count: curr.CountNew,
+                    TaxonomicOrder: curr.TaxonomicOrder,
+                    Location: curr.LocationHeardKey
+                  },
+                ],
+                Region: curr.Region,
+              };
+              accumulator.push(obj);
             }
-
             return accumulator;
-        }, [])
+          }, []);
+
+          let arrMergedAudioRecorded = arrAudioRecordedTotal.reduce((accumulator, curr) => {
+            let occurs = accumulator.findIndex((item) => item.LocationHeardKey === curr.LocationHeardKey);
+            if (occurs >= 0) {
+              // If the location is already in the array, push the scientific and common name to its nested array.
+              accumulator[occurs].species.push({
+                ScientificNameKey: curr.ScientificNameKey,
+                CommonName: curr.CommonName,
+                MyDate: curr.Date,
+                Count: curr.CountNew,
+                TaxonomicOrder: curr.TaxonomicOrder,
+                Location: curr.LocationHeardKey,
+                SubmissionID: curr['Submission ID']
+              });
+            } else {
+              // Otherwise, add a new object to the array.
+              let obj = {
+                LocationHeardKey: curr.LocationHeardKey,
+                species: [
+                  {
+                    ScientificNameKey: curr.ScientificNameKey,
+                    CommonName: curr.CommonName,
+                    MyDate: curr.Date,
+                    Count: curr.CountNew,
+                    TaxonomicOrder: curr.TaxonomicOrder,
+                    Location: curr.LocationHeardKey,
+                    SubmissionID: curr['Submission ID']
+                  },
+                ],
+                Region: curr.Region,
+              };
+              accumulator.push(obj);
+            }
+            return accumulator;
+          }, []);
+          
         // console.log(arrMergedHeardSpecies);
 
-        arrMergedHeardSpecies.map( objElem => {            
-            let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx] }))
+        // arrMergedHeardSpecies.map( objElem => {            
+        //     let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx]}))
 
-            objElem.ScientificNameKey = ocurrences;
-        })
+        //     objElem.ScientificNameKey = ocurrences;
+        // })
 
-        arrMergedHeardSpecies.map( item => {
-            let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
-                const index = acc.findIndex(singleObj => {
-                    return singleObj["name"] === curr["name"]
-                });
+        // arrMergedHeardSpecies.map( item => {
+        //     let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
+        //         const index = acc.findIndex(singleObj => {
+        //             return singleObj["name"] === curr["name"]
+        //         });
     
-                if (index >= 0) {
-                    var originalValue = acc[index]["value"];
-                    originalValue += curr["value"];
-                    acc[index]["value"] = originalValue;
-                }  
+        //         if (index >= 0) {
+        //             var originalValue = acc[index]["value"];
+        //             originalValue += curr["value"];
+        //             acc[index]["value"] = originalValue;
+        //         }  
     
-                else {
-                    acc.push(curr);
-                }
+        //         else {
+        //             acc.push(curr);
+        //         }
             
-                return acc;
-            }, []);
+        //         return acc;
+        //     }, []);
 
-            item.ScientificNameKey = newMergedHeardSpecies
+        //     item.ScientificNameKey = newMergedHeardSpecies
 
-            delete item.CommonName;
-        }) 
+        //     delete item.CommonName;
+        // }) 
 
-        let audioRecordedBuildArr =  buildObjFile.buildObjData(arrAudioRecordedTotal)
+        // let audioRecordedBuildArr =  buildObjFile.buildObjData(arrAudioRecordedTotal)
+        
         let onlyHeardSpecies = buildObjFile.buildObjData(arrOnlyHeardSpecies);
         let heardSeenBuildArr = buildObjFile.buildObjData(arrHeardSeenSpecies);
         let heardAndGlimpsed = buildObjFile.buildObjData(arrHeardGlimpsedSpecies)
@@ -432,7 +537,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
         console.log("antes de escribir archivos")
 
         const filesToWrite = [
-            { fileName: 'audioRecorded.jsonld', data: audioRecordedBuildArr},
+            // {fileName: 'RegionsAlternative.jsonld', data: arrNewCountryCode},
+            { fileName: 'audioRecorded.jsonld', data: arrMergedAudioRecorded},
             { fileName: 'onlyHeard.jsonld', data: onlyHeardSpecies },
             { fileName: 'allHeardSpecies.jsonld', data: arrMergedHeardSpecies },
             { fileName: 'heardSeenSpecies.jsonld', data: heardSeenBuildArr },
@@ -1208,447 +1314,447 @@ writeFiles(filesToWrite, path.join(__dirname, './components/writtenFiles'));
         let numIndex = 0;
         let countGroups = 0;
     
-        for (key in objectFormat) {
-            let familyName = key;
-            pObj = docx.createP()
+        // for (key in objectFormat) {
+        //     let familyName = key;
+        //     pObj = docx.createP()
 
-            if(familyName.includes('others')) {
-                console.log('no')
-            }
+        //     if(familyName.includes('others')) {
+        //         console.log('no')
+        //     }
 
-            else {
-                pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
-                pObj.addLineBreak()
-            }
+        //     else {
+        //         pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+        //         pObj.addLineBreak()
+        //     }
     
-            value = objectFormat[key];
+        //     value = objectFormat[key];
     
-            for (let elem = 0; elem < value.length; elem++) {
+        //     for (let elem = 0; elem < value.length; elem++) {
     
-                let commonName = value[elem]['Common Name'];
-                let scientificName = value[elem]['Scientific Name'];
-                let locationDetails = value[elem]['Location'];
-                let locationHeard = value[elem]['Location_heard']
-                let locationBoth = value[elem]['Location_both']
-                let subSpecieName = value[elem]['subspecie']
-                let sspLocation = value[elem]['sspLocation']
-                let sspLocationHeard = value[elem]['sspLocationHeard']
-                let sspLocationBoth = value[elem]['sspLocationBoth']
+        //         let commonName = value[elem]['Common Name'];
+        //         let scientificName = value[elem]['Scientific Name'];
+        //         let locationDetails = value[elem]['Location'];
+        //         let locationHeard = value[elem]['Location_heard']
+        //         let locationBoth = value[elem]['Location_both']
+        //         let subSpecieName = value[elem]['subspecie']
+        //         let sspLocation = value[elem]['sspLocation']
+        //         let sspLocationHeard = value[elem]['sspLocationHeard']
+        //         let sspLocationBoth = value[elem]['sspLocationBoth']
 
-                function conservationCodeFunction () {
-                    if(value[elem]['Conservation_Code'] === 'LC') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '00af50'})
-                    }
+        //         function conservationCodeFunction () {
+        //             if(value[elem]['Conservation_Code'] === 'LC') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '00af50'})
+        //             }
 
-                    else if(value[elem]['Conservation_Code'] === 'NT') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '92d050'})
-                    }
+        //             else if(value[elem]['Conservation_Code'] === 'NT') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: '92d050'})
+        //             }
 
-                    else if(value[elem]['Conservation_Code'] === 'VU') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ffc000'})
-                    }
+        //             else if(value[elem]['Conservation_Code'] === 'VU') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ffc000'})
+        //             }
 
-                    else if(value[elem]['Conservation_Code'] === 'EN') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'e26c09'})
-                    }
+        //             else if(value[elem]['Conservation_Code'] === 'EN') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'e26c09'})
+        //             }
 
-                    else if(value[elem]['Conservation_Code'] === 'CR') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'C00000'})
-                    }
+        //             else if(value[elem]['Conservation_Code'] === 'CR') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'C00000'})
+        //             }
             
-                    else if(value[elem]['Conservation_Code'] === 'DD') {
-                        pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'a6a6a6'})
-                    }
-                }
+        //             else if(value[elem]['Conservation_Code'] === 'DD') {
+        //                 pObj.addText('  ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText(value[elem]['Conservation_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'a6a6a6'})
+        //             }
+        //         }
 
-                function presenceCodeFunc () {
-                    if(value[elem]['Presence_Code'] === 'NB') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('NB' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
-                    }
+        //         function presenceCodeFunc () {
+        //             if(value[elem]['Presence_Code'] === 'NB') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('NB' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+        //             }
 
-                    else if(value[elem]['Presence_Code'] === 'V') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('V' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
-                    }
+        //             else if(value[elem]['Presence_Code'] === 'V') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('V' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+        //             }
 
-                    else if(value[elem]['Presence_Code'] === 'IN') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('IN' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
-                    }
+        //             else if(value[elem]['Presence_Code'] === 'IN') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('IN' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+        //             }
 
-                    else if(value[elem]['Presence_Code'] === 'EX') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('EX' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
-                    }
+        //             else if(value[elem]['Presence_Code'] === 'EX') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('EX' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+        //             }
 
-                    else if(value[elem]['Presence_Code'] === 'H') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('H' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
-                    }
+        //             else if(value[elem]['Presence_Code'] === 'H') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('H' , { bold: true, font_face: 'Calibri', font_size: 12, color: '000000'})
+        //             }
             
-                    else if(value[elem]['Presence_Code'] === 'X(e)') {
-                        pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
-                        pObj.addText('E (PE)' , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ff0000'})
-                    }
-                }
+        //             else if(value[elem]['Presence_Code'] === 'X(e)') {
+        //                 pObj.addText(' ', {font_face: 'Calibri', font_size: 12})
+        //                 pObj.addText('E (PE)' , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffffff', back: 'ff0000'})
+        //             }
+        //         }
 
-                function restricctionCodeFunc () {
-                    if(value[elem]['Restricction_Code'] === 'NE') {
-                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'c00000'})
-                    }
+        //         function restricctionCodeFunc () {
+        //             if(value[elem]['Restricction_Code'] === 'NE') {
+        //                 pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'c00000'})
+        //             }
 
-                    else if(value[elem]['Restricction_Code'] === 'RR') {
-                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'e26c09'})
-                    }
+        //             else if(value[elem]['Restricction_Code'] === 'RR') {
+        //                 pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'e26c09'})
+        //             }
 
-                    else if(value[elem]['Restricction_Code'] === 'LC') {
-                        pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffc000'})
-                    }
-                }
+        //             else if(value[elem]['Restricction_Code'] === 'LC') {
+        //                 pObj.addText('  ' + value[elem]['Restricction_Code'] , { bold: true, font_face: 'Calibri', font_size: 12, color: 'ffc000'})
+        //             }
+        //         }
 
-                function locationsFunc () {
-                    if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
-                        pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()        
-                        pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //         function locationsFunc () {
+        //             if(locationDetails !== '' && locationHeard !== '' && locationBoth !== '') {
+        //                 pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()        
+        //                 pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
 
-                        pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //                 pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
-                        pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //             else if (locationDetails !== '' && locationHeard !== '' && locationBoth === '') {
+        //                 pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
         
-                        pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //                 pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
-                        pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //             else if (locationDetails !== '' && locationBoth !== '' && locationHeard === '') {
+        //                 pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
         
-                        pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //                 pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
-                        pObj.addText("Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //             else if (locationHeard !== '' && locationBoth !== '' && locationDetails === '') {
+        //                 pObj.addText("Heard only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
         
-                        pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //                 pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
-                        pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //             else if (locationHeard !== '' && locationDetails === '' && locationBoth === '') {
+        //                 pObj.addText("Heard Only at: " + locationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
-                        pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //             else if (locationBoth !== '' && locationHeard === '' && locationDetails === '') {
+        //                 pObj.addText("Heard and Seen at: " + locationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
-                        pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
-                        pObj.addLineBreak()
-                    }
+        //             else if (locationDetails !== '' && locationHeard === '' && locationBoth === '') {
+        //                 pObj.addText("Seen at: " + locationDetails, { font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addLineBreak()
+        //             }
 
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
-                }
+        //             pObj.addLineBreak()                                               
+        //             pObj.addLineBreak()
+        //         }
 
-            if(familyName.includes('others')) {
-                pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //     if(familyName.includes('others')) {
+        //         pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+        //         pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
             
-                //adding codes 
-                    conservationCodeFunction()
-                    presenceCodeFunc();
-                    restricctionCodeFunc();
+        //         //adding codes 
+        //             conservationCodeFunction()
+        //             presenceCodeFunc();
+        //             restricctionCodeFunc();
                  
 
-                pObj.addLineBreak()                                               
-                pObj.addLineBreak()
+        //         pObj.addLineBreak()                                               
+        //         pObj.addLineBreak()
 
-                // locations func()
-                locationsFunc();
+        //         // locations func()
+        //         locationsFunc();
 
-            }
+        //     }
 
-            else {
+        //     else {
 
    
-                if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group') && !value[elem]['category'].includes('form')) {
-                    numIndex++;
+        //         if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group') && !value[elem]['category'].includes('form')) {
+        //             numIndex++;
     
-                    pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
                     
-                    pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                    pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
                 
-                    //adding codes 
-                        conservationCodeFunction()
-                        presenceCodeFunc();
-                        restricctionCodeFunc();
+        //             //adding codes 
+        //                 conservationCodeFunction()
+        //                 presenceCodeFunc();
+        //                 restricctionCodeFunc();
                         
  
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
+        //             pObj.addLineBreak()                                               
+        //             pObj.addLineBreak()
                     
-                    // locations func()
-                    locationsFunc();
+        //             // locations func()
+        //             locationsFunc();
 
-                    if( subSpecieName !== '') {
+        //             if( subSpecieName !== '') {
 
-                        if(subSpecieName.split(';').length > 1) {
-                            pObj.addText('          '+subSpecieName.split(';')[0], {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 if(subSpecieName.split(';').length > 1) {
+        //                     pObj.addText('          '+subSpecieName.split(';')[0], {bold: true, font_face: 'Calibri', font_size: 12 })
 
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                            pObj.addText('          '+"Seen at: " + sspLocation.split(';')[0], { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
-                            pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                     pObj.addText('          '+"Seen at: " + sspLocation.split(';')[0], { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
+        //                     pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
 
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                            pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                     pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                 }
 
-                        else {
-                            pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 else {
+        //                     pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
 
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                 }
 
-                        if(sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth !== '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 if(sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth !== '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
     
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationBoth !== '' && sspLocationHeard === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocation !== '' && sspLocationBoth !== '' && sspLocationHeard === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationHeard !== '' && sspLocationBoth !== '' && sspLocation === '') {
-                            pObj.addText('          '+"Heard only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocationHeard !== '' && sspLocationBoth !== '' && sspLocation === '') {
+        //                     pObj.addText('          '+"Heard only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationHeard !== '' && sspLocation === '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocationHeard !== '' && sspLocation === '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationBoth !== '' && sspLocationHeard === '' && sspLocation === '') {
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocationBoth !== '' && sspLocationHeard === '' && sspLocation === '') {
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationHeard === '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocation !== '' && sspLocationHeard === '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
 
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
 
-                    }
+        //             }
 
-                } 
+        //         } 
                     
                     
-                else {
+        //         else {
                     
-                    //hacer comparacion con un array construido con los elems que no tienen especie
+        //             //hacer comparacion con un array construido con los elems que no tienen especie
 
-                    if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName) || commonName === 'Rock Pigeon (Feral Pigeon)') {
-                        numIndex++;
-                        pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
-                        pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
-                        pObj.addText(' (' + scientificName.split(' ')[0] + ' '+scientificName.split(' ')[1] + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName) || commonName === 'Rock Pigeon (Feral Pigeon)') {
+        //                 numIndex++;
+        //                 pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addText(' (' + scientificName.split(' ')[0] + ' '+scientificName.split(' ')[1] + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
                         
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
-                    }
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
+        //             }
 
-                    if(value[elem]['category'].includes('group')) {
-                        pObj.addText('     • ', { bold: true, font_face: 'Calibri', font_size: 16 })
+        //             if(value[elem]['category'].includes('group')) {
+        //                 pObj.addText('     • ', { bold: true, font_face: 'Calibri', font_size: 16 })
 
-                        pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                        pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
-                    }
+        //                 pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             }
 
-                    else {
+        //             else {
 
-                        pObj.addText('     '+commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                        pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
-                    }
+        //                 pObj.addText('     '+commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+        //             }
                     
-                    // adding codes
-                    conservationCodeFunction()
-                    presenceCodeFunc();
-                    restricctionCodeFunc();
+        //             // adding codes
+        //             conservationCodeFunction()
+        //             presenceCodeFunc();
+        //             restricctionCodeFunc();
                  
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
+        //             pObj.addLineBreak()                                               
+        //             pObj.addLineBreak()
 
-                    locationsFunc();
+        //             locationsFunc();
 
-                    if( subSpecieName !== '') {
+        //             if( subSpecieName !== '') {
 
-                        if(subSpecieName.split(';').length > 1) {
-                            pObj.addText('          '+subSpecieName.split(';')[0], {bold: true, font_face: 'Calibri', font_size: 12 })
-                            pObj.addText('          '+"Seen at: " + sspLocation.split(';')[0], { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
-                            pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
-                            pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
+        //                 if(subSpecieName.split(';').length > 1) {
+        //                     pObj.addText('          '+subSpecieName.split(';')[0], {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addText('          '+"Seen at: " + sspLocation.split(';')[0], { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
+        //                     pObj.addText('          '+subSpecieName.split(';')[1], {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addText('          '+"Seen at: " + sspLocation.split(';')[1], { font_face: 'Calibri', font_size: 12 })
 
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                 }
 
-                        else {
-                            pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
+        //                 else {
+        //                     pObj.addText('          '+subSpecieName, {bold: true, font_face: 'Calibri', font_size: 12 })
 
-                            pObj.addLineBreak()                                               
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addLineBreak()                                               
+        //                     pObj.addLineBreak()
+        //                 }
 
 
-                        if(sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth !== '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 if(sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth !== '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
     
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocation !== '' && sspLocationHeard !== '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationBoth !== '' && sspLocationHeard === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocation !== '' && sspLocationBoth !== '' && sspLocationHeard === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationHeard !== '' && sspLocationBoth !== '' && sspLocation === '') {
-                            pObj.addText('          '+"Heard only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                            pObj.addLineBreak()
+        //                 else if (sspLocationHeard !== '' && sspLocationBoth !== '' && sspLocation === '') {
+        //                     pObj.addText('          '+"Heard only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                     pObj.addLineBreak()
             
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationHeard !== '' && sspLocation === '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocationHeard !== '' && sspLocation === '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Heard Only at: " + sspLocationHeard, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocationBoth !== '' && sspLocationHeard === '' && sspLocation === '') {
-                            pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocationBoth !== '' && sspLocationHeard === '' && sspLocation === '') {
+        //                     pObj.addText('          '+"Heard and Seen at: " + sspLocationBoth, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
     
-                        else if (sspLocation !== '' && sspLocationHeard === '' && sspLocationBoth === '') {
-                            pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
-                            pObj.addLineBreak()
-                        }
+        //                 else if (sspLocation !== '' && sspLocationHeard === '' && sspLocationBoth === '') {
+        //                     pObj.addText('          '+"Seen at: " + sspLocation, { font_face: 'Calibri', font_size: 12 })
+        //                     pObj.addLineBreak()
+        //                 }
 
-                        pObj.addLineBreak()
-                        pObj.addLineBreak()
+        //                 pObj.addLineBreak()
+        //                 pObj.addLineBreak()
 
-                    }
+        //             }
 
-                }
-            }
+        //         }
+        //     }
             
             
-            }
-        }
+        //     }
+        // }
 
-        console.log("Hola vamos a terminar el programa")
+        // console.log("Hola vamos a terminar el programa")
     
-        pObj1 = docx.createP()
-        pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
-        pObj1.addLineBreak()
-        pObj1.addLineBreak()
-        pObj1.addText('Scientific Names of Groups', {bold: true, font_face: 'Calibri', font_size: 16 })
-        pObj1.addLineBreak()
-        pObj1.addLineBreak()
+        // pObj1 = docx.createP()
+        // pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+        // pObj1.addLineBreak()
+        // pObj1.addLineBreak()
+        // pObj1.addText('Scientific Names of Groups', {bold: true, font_face: 'Calibri', font_size: 16 })
+        // pObj1.addLineBreak()
+        // pObj1.addLineBreak()
 
     
-        let out = fs.createWriteStream('Report.docx')
+        // let out = fs.createWriteStream('Report.docx')
     
-        out.on('error', function(err) {
-            console.log(err)
-        })
+        // out.on('error', function(err) {
+        //     console.log(err)
+        // })
     
-        // Async call to generate the output file:
-        docx.generate(out)
+        // // Async call to generate the output file:
+        // docx.generate(out)
     
-        return filteredData;
+        // return filteredData;
     }
     
     // return a Promise
