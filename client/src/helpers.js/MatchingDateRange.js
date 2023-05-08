@@ -30,14 +30,14 @@ function findMatchingDates(dateObjects, startYear, endYear, startMonth, endMonth
       if(Number(monthMap[startMonth]) === 11 && Number(monthMap[endMonth]) === 1){
         
         if (startYearNumber <= year && endYearNumber >= year && (month === 0 || month === 1 || month === 11)) {
-            console.log("case")
+            // console.log("case")
           matchingDates.push(dateObjects[i]);
         }
       }
 
       else {
         if (startYearNumber <= year && endYearNumber >= year && Number(monthMap[startMonth]) <= month && Number(monthMap[endMonth]) >= month) {
-          console.log("yes")
+          // console.log("yes")
           matchingDates.push(dateObjects[i]);
         }
       }   

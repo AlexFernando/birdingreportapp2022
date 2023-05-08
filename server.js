@@ -4,10 +4,12 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
 const myLogic = require('./client/src/myLogic');
+const statsGenerationFiles = require('./StatsGenerationFiles')
 const { conservationCodesResults } = require('./client/src/excelConservationCode');
 
 const writeStats = require('./client/src/logicWriteStats');
 
+// const async = require('async');
 //heroku config
 const port = process.env.PORT || 5000;
 
@@ -63,6 +65,21 @@ app.post('/updatepersonaldata', (req, res) => {
       res.json({ fileName: file.name, filePath: `/updatesfiles/personaldata/personalData.csv` });
   })
 });
+
+//update stats by user when a new personal data file is uploaded
+app.post('/stats', async (req, res) => {
+  try {
+    statsGenerationFiles.StatsGenerationFiles();
+    setTimeout(() => {
+      res.send('Stats updated successfully');
+    }, 35000); // 35 minute delay
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating stats');
+  }
+});
+
+
 
 
 app.post('/updatemaindata', (req, res) => {

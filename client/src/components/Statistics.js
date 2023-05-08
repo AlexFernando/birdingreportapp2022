@@ -14,6 +14,8 @@ import axios from 'axios';
 
 import MyForm from './ModalForm'
 
+import UpdateStatsButton from './UpdateStatsButton'
+
 //In another component you need to get the array of audio recorded birds, filter that from obs.details, then you need to get the data  
 //(don't forget the code) required and build the link with the coe
 
@@ -23,13 +25,34 @@ const StatisticsComponent = () => {
 
     const [speciesList, setSpeciesList] = useState([]);
     const [seasonSpeciesList, setSeasonSpeciesList] = useState([])
+    const [speciesAccumulated, setSpeciesAccumulated] = useState([])
+    const [seasonSpeciesAcc, setSeasonSpeciesAcc] = useState([])
     const [speciesSum, setSpeciesSum] = useState(0);
     const [tagFilter, setTagFilter] = useState(''); 
     const [genereated, setGenerated] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
 
-    const getSpecies = (data) => {
+
+    /**BUTTON SWITCH TABLES */
+    const [stateData, setStateData] = useState('Disaggregated Data')
+
+    /**Item Switch color */
+    const [activeItem, setActiveItem] = useState(0);
+
+    const handleItemClick = itemIndex => {
+      setActiveItem(itemIndex);
+
+      if(itemIndex === 0) {
+        setStateData('Disaggregated Data')
+      }
+      else {
+        setStateData('Frequency Data')
+      }
+    };
+
+    const getSpecies = (data, dataFrequency) => {
         setSpeciesList(data)
+        setSpeciesAccumulated(dataFrequency)
         setTagFilter('')
     }
 
@@ -40,20 +63,51 @@ const StatisticsComponent = () => {
     const handleDescendingOrder = () => {
         setSpeciesList([...speciesList].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
         setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
+        setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
+        setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
         setTagFilter('Descending Taxonomic Order')
     }
     
     const handleAscendingOrder = () => {
         setSpeciesList([...speciesList].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
         setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
+        setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
+        setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
         setTagFilter('Ascending Taxonomic Order')
     }
 
     const handleAlphabeticOrder = () => {
         setSpeciesList([...speciesList].sort((a,b) => (a.ScientificNameKey > b.ScientificNameKey) ? 1 : ((b.ScientificNameKey > a.ScientificNameKey) ? -1 : 0)))
         setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => (a.ScientificNameKey > b.ScientificNameKey) ? 1 : ((b.ScientificNameKey > a.ScientificNameKey) ? -1 : 0)))
+        setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => (a.ScientificName > b.ScientificName) ? 1 : ((b.ScientificName > a.ScientificName) ? -1 : 0)))
+        setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => (a.ScientificName > b.ScientificName) ? 1 : ((b.ScientificName > a.ScientificName) ? -1 : 0)))
         setTagFilter('Alphabetic Order')
     }
+
+    const handleFrequencyAscending = () => {
+        setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => a.Frequency - b.Frequency))
+        setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => a.Frequency - b.Frequency))
+        setTagFilter('Frequency Ascending Order')
+    }
+
+    const handleFrequencyDescending = () => {
+        setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => b.Frequency - a.Frequency))
+        setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => b.Frequency - a.Frequency))
+        setTagFilter('Frequency Descending Order')
+    }
+
+    const handleDateDescending = () => {
+        setSpeciesList([...speciesList].sort((a, b) => (new Date(b.MyDate).getTime() - new Date(a.MyDate).getTime())));
+        setSeasonSpeciesList([...seasonSpeciesList].sort((a, b) => (new Date(b.MyDate).getTime() - new Date(a.MyDate).getTime())));
+        setTagFilter('Newest Date')
+    }
+
+    const handleDateAscending = () => {
+        setSpeciesList([...speciesList].sort((a, b) => (new Date(a.MyDate).getTime() - new Date(b.MyDate).getTime())));
+        setSeasonSpeciesList([...seasonSpeciesList].sort((a, b) => (new Date(a.MyDate).getTime() - new Date(b.MyDate).getTime())));
+        setTagFilter('Oldest Date')
+    }
+
 
     //Download Stats file
 
@@ -77,13 +131,18 @@ const StatisticsComponent = () => {
 
   const handleResetDates = () => {
     setSeasonSpeciesList([])
+    setSeasonSpeciesAcc([])
   }
 
 
      return(
         <Container>
             <Title>Statistics</Title>
-            
+            <div className="col-md-12 text-right">
+                      
+                            <UpdateStatsButton />
+                    
+                        </div>
             <SearchBarContainer>
                 <AnimatedMulti getSpecies = {getSpecies} />
             </SearchBarContainer>
@@ -99,122 +158,195 @@ const StatisticsComponent = () => {
                 >
                     <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Descending Taxonomic Order</Dropdown.Item>
                     <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Ascending Taxonomic Order</Dropdown.Item>
-                    <Dropdown.Item eventKey="3" onClick = {handleAlphabeticOrder}>Alphabetic</Dropdown.Item>
-            
+                    <Dropdown.Item eventKey="3" onClick = {handleAlphabeticOrder}>Alphabetic</Dropdown.Item>        
+                    <Dropdown.Item eventKey="4" onClick = {handleFrequencyAscending}>Frequency Ascending Order</Dropdown.Item>     
+                    <Dropdown.Item eventKey="5" onClick = {handleFrequencyDescending}>Frequency Desscending Order</Dropdown.Item>    
+                    <Dropdown.Item eventKey="6" onClick = {handleDateDescending}>Newest Date</Dropdown.Item>   
+                    <Dropdown.Item eventKey="7" onClick = {handleDateAscending}>Oldest Date</Dropdown.Item>       
                 </DropdownButton>
 
                 <p><span>{check}</span>{tagFilter}</p>
             </FilterContainer>
 
          
-                <MyForm speciesListAll={speciesList}  setSeasonSpeciesList={setSeasonSpeciesList}/>
+                <MyForm speciesListAll={speciesList} setSeasonSpeciesList={setSeasonSpeciesList} setSeasonSpeciesAcc={setSeasonSpeciesAcc}/>
 
                 <Button className="ml-2" variant="primary" type="submit"  onClick={handleResetDates}>
                     Reset Dates
                 </Button>
-        
 
-            <TableContainer>
-                <TableTag className="table table-responsive-md">
+                <ListContainer>
+                    <ListItem active={activeItem === 0} onClick={() => handleItemClick(0)}>Disaggregated Data</ListItem>
+                    <ListItem active={activeItem === 1} onClick={() => handleItemClick(1)}>Frequency Data</ListItem>
+                </ListContainer>
+
+                <>
                     {
-                        speciesList.length === 0 ? <div><span>No stats to show, yet. You may choose a Hotspot</span></div>
+                        stateData === 'Disaggregated Data' ? 
+                        
+                            <TableContainer>
+                                <TableTag className="table table-responsive-md">
+                                    {
+                                        speciesList.length === 0 ? <div><span>No stats to show, yet. You may choose a Hotspot</span></div>
+                                    
+                                    :
+                                    <tbody>
+                                        <TextTable>
+                
+                                            <th>Scientific Name</th>
+                                            <th>Common Name</th>
+                                            <th>Register Date</th>
+                                            <th>Count</th>
+                                            <th>Location Hotspot</th>
+                                            <th>Nº Tax.</th>
+                                        </TextTable>
+                
+                        
+                                        {
+                                            seasonSpeciesList.length>0 ? 
+
+                                                seasonSpeciesList.map((elem, idx) => {
+                                                  
+                                                        return(
+                                                
+                                                            <TextTable key={idx}>
+                
+                                                                <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
+                                                                <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                                {
+                                                                        elem['SubmissionID'] !== undefined? 
+                                                                            <TextColumn>
+                                                                                <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
+                                                                                    {elem['MyDate']}
+                                                                                </a>
+                                                                            </TextColumn>
+                                                                        :
+                
+                                                                        <TextColumn>{elem['MyDate']}</TextColumn>
+                                                                    }
+                                                                <TextColumn>{elem['Count']}</TextColumn>
+                                                                <TextColumn>{elem['Location']}</TextColumn>
+                                                                <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                                            </TextTable>
+                                                        )
+                                                    
+                                                })
+                
+                                                
+                
+                                            :
+                                
+                                                speciesList.length>0 && speciesList.map((elem, idx) => {
+                                                 
                     
-                    :
-                    <tbody>
-                        <TextTable>
-
-                            <th>Scientific Name</th>
-                            <th>Common Name</th>
-                            <th>Register Date</th>
-                            <th>Count</th>
-                            <th>Location Hotspot</th>
-                            <th>Nº Tax.</th>
-                        </TextTable>
-
-                        {
-                            seasonSpeciesList.length>0 ? 
-                                seasonSpeciesList.map((elem, idx) => {
-                                    if (elem) {
-    
-                                        return(
-                                  
-                                            <TextTable key={idx}>
-
-                                                <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
-                                                <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
-                                                {
-                                                        elem['SubmissionID'] !== undefined? 
-                                                            <TextColumn>
-                                                                <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
-                                                                    {elem['MyDate']}
-                                                                </a>
-                                                            </TextColumn>
-                                                        :
-
-                                                        <TextColumn>{elem['MyDate']}</TextColumn>
-                                                    }
-                                                <TextColumn>{elem['Count']}</TextColumn>
-                                                <TextColumn>{elem['Location']}</TextColumn>
-                                                <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
-                                            </TextTable>
-                                        )
-                                    }
-                                })
-
-                                
-
-                                :
-                 
-                                    speciesList.length>0 && speciesList.map((elem, idx) => {
-                                        if (elem) {
-        
-                                            return(
-                                      
-                                                <TextTable key={idx}>
-
-                                                    <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
-                                                    <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
-                                                    {
-                                                        elem['SubmissionID'] !== undefined? 
-                                                            <TextColumn>
-                                                                <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
-                                                                    {elem['MyDate']}
-                                                                </a>
-                                                            </TextColumn>
-                                                        :
-
-                                                        <TextColumn>{elem['MyDate']}</TextColumn>
-                                                    }
-
-                                                    <TextColumn>{elem['Count']}</TextColumn>
-                                                    <TextColumn>{elem['Location']}</TextColumn>
-                                                    <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
-                                                </TextTable>
-                                            )
+                                                        return(
+                                                
+                                                            <TextTable key={idx}>
+            
+                                                                <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
+                                                                <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                                {
+                                                                    elem['SubmissionID'] !== undefined? 
+                                                                        <TextColumn>
+                                                                            <a href={`https://ebird.org/peru/checklist/${elem['SubmissionID']}`} target="_blank" rel="noreferrer noopener">
+                                                                                {elem['MyDate']}
+                                                                            </a>
+                                                                        </TextColumn>
+                                                                    :
+            
+                                                                    <TextColumn>{elem['MyDate']}</TextColumn>
+                                                                }
+            
+                                                                <TextColumn>{elem['Count']}</TextColumn>
+                                                                <TextColumn>{elem['Location']}</TextColumn>
+                                                                <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                                            </TextTable>
+                                                        )
+                                                    
+                                                })
+                                            
                                         }
-                                    })
+                                            
+                                    </tbody>
+                                    }   
+                                </TableTag>
+            
+                            </TableContainer>
+        
+                        : 
+                        
+                        <TableContainer>
+                            <TableTag className="table table-responsive-md">
+                                {
+                                    speciesAccumulated.length === 0 ? <div><span>No stats to show, yet. You may choose a Hotspot</span></div>
                                 
-                        }
-                            
-     
-                        
-                        
-         
-                    </tbody>
-                    }   
-                </TableTag>
+                                :
+                                <tbody>
+                                    <TextTable>
+            
+                                        <th>Scientific Name</th>
+                                        <th>Common Name</th>
+                                        <th>Frequency</th>
+                                        <th>Percentage</th>
+                                        <th>Nº Tax.</th>
+                                    </TextTable>
+            
+                    
+                                    {
+                                                                                    seasonSpeciesAcc.length>0 ? 
 
-                {
-                    speciesList.length > 0?    
-                        <input onClick={handleStateListForRequest} type='submit'value='Generate Report' className='btn btn-primary btn-block mt-4'/>
-                    :null
-                }
+                                                                                    seasonSpeciesAcc.map((elem, idx) => {
+                                                                                      
+                                                        
+                                                                                            return(
+                                                                                    
+                                                                                                <TextTable key={idx}>
+                                                    
+                                                                                                    <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificNameKey']}</TextColumnAlternative>
+                                                                                                    <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                                                                    <TextColumn>{elem['Frequency']}</TextColumn>
+                                                        <TextColumn>{elem['Percentage']}{"%"}</TextColumn>
+                                                                                                    <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                                                                                </TextTable>
+                                                                                            )
+                                                                                        
+                                                                                    })
+                :                                    
+  
+                                        speciesAccumulated.length>0 && speciesAccumulated.map((elem, idx) => {
+                                          
+                                                return(
+                                        
+                                                    <TextTable key={idx}>
+                                                        <TextColumnAlternative>{idx+1}{".-  "}{elem['ScientificName']}</TextColumnAlternative>
+                                                        <TextColumnAlternative>{elem['CommonName']}</TextColumnAlternative>
+                                                        <TextColumn>{elem['Frequency']}</TextColumn>
+                                                        <TextColumn>{elem['Percentage']}{"%"}</TextColumn>
+                                                        <TextColumn><span>{elem['TaxonomicOrder']}</span></TextColumn>
+                                                    </TextTable>
+                                                )
+                                            
+                                        })
+                                    }
+                                        
+                                </tbody>
+                                }   
+                            </TableTag>
+    
+                        </TableContainer>
+                
+                    }
+                </>
+        
 
-
-            </TableContainer>
-
+  
             {/**Download file */}
-
+            {
+                speciesList.length > 0?    
+                    <input onClick={handleStateListForRequest} type='submit'value='Generate Report' className='btn btn-primary btn-block mt-4'/>
+                :null
+            }
+                
             {
                 genereated ? <div className="text-center">
                 <form onSubmit = {onSubmitDownload} >
@@ -297,4 +429,24 @@ const TextColumnAlternative = styled.td`
 const DateYearSelect = styled.div`
     display: flex;
     justify-content: space-evenly;
+`
+const ListContainer = styled.ul`
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    margin-top: 3rem;
+
+`
+
+const ListItem = styled.li`
+    cursor: pointer;   
+    list-style: none;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: auto 3rem;
+    color: ${props => (props.active ? "#0c0c0c" : "#a6a6a6")};
+    border-bottom: ${props => props.active ? "2px solid #0c0c0c": "unset"};
+
 `

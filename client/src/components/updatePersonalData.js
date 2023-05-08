@@ -5,6 +5,7 @@ import Message from './Message';
 import Progress from './Progress';
 import DateForm from './DateForm';
 import axios from 'axios';
+import UpdateStatsButton from './UpdateStatsButton';
 
 const UpdatePersonalData = () => {
 
@@ -72,7 +73,7 @@ const UpdatePersonalData = () => {
                     <div>
                       <h4>Update Personal data:</h4>
                       <div className="row">
-                        <div className="col-md-8">
+                        <div className="col-md-12 mt-auto">
                           <form onSubmit={onSubmit}>
                             <div className='custom-file mb-4'>
                               <input
@@ -86,16 +87,18 @@ const UpdatePersonalData = () => {
                               </label>
                             </div>
                             <Progress percentage={uploadPercentage} />
-                            <input
-                              type='submit'
-                              value='Upload'
-                              className='btn btn-primary btn-block mt-4'
-                            />
+                            <div>
+                              <input
+                                type='submit'
+                                value='Upload'
+                                className='btn btn-primary mt-4'
+                              />
+                            </div>
                           </form>
                         </div>
                         <div className="col-md-4">
                           {uploadedFile === 'uploaded'?      
-                            <button className="btn btn-primary btn-block mt-4">Update Stats</button>
+                            <UpdateStatsButton />
                             : null
                           }
                         </div>

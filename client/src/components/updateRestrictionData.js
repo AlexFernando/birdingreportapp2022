@@ -71,7 +71,7 @@ const UpdateRestrictionData = () => {
                     <div>
                       <h4>Update Restriction data:</h4>
                       <div className="row">
-                        <div className="col-md-8">
+                        <div className="col-md-12">
                           <form onSubmit={onSubmit}>
                             <div className='custom-file mb-4'>
                               <input
@@ -85,11 +85,13 @@ const UpdateRestrictionData = () => {
                               </label>
                             </div>
                             <Progress percentage={uploadPercentage} />
-                            <input
-                              type='submit'
-                              value='Upload'
-                              className='btn btn-primary btn-block mt-4'
-                            />
+                            <div>
+                              <input
+                                type='submit'
+                                value='Upload'
+                                className='btn btn-primary mt-4'
+                              />
+                            </div>
                           </form>
                         </div>
         

@@ -71,7 +71,7 @@ const UpdateMainData = () => {
                     <div>
                       <h4>Update Main data:</h4>
                       <div className="row">
-                        <div className="col-md-8">
+                        <div className="col-md-12">
                           <form onSubmit={onSubmit}>
                             <div className='custom-file mb-4'>
                               <input
@@ -85,19 +85,16 @@ const UpdateMainData = () => {
                               </label>
                             </div>
                             <Progress percentage={uploadPercentage} />
-                            <input
-                              type='submit'
-                              value='Upload'
-                              className='btn btn-primary btn-block mt-4'
-                            />
+                            <div>
+                              <input
+                                type='submit'
+                                value='Upload'
+                                className='btn btn-primary mt-4'
+                              />
+                            </div>
                           </form>
                         </div>
-                        <div className="col-md-4">
-                          {uploadedFile === 'uploaded'?      
-                            <button className="btn btn-primary btn-block mt-4">Update Stats</button>
-                            : null
-                          }
-                        </div>
+                
                       </div>
                     </div>
             </div>

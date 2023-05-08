@@ -4,6 +4,7 @@ import { default as ReactSelect } from "react-select";
 
 const MySelect = props => {
   if (props.allowSelectAll) {
+
     return (
       <ReactSelect
         {...props}
@@ -16,6 +17,7 @@ const MySelect = props => {
           ) {
             return props.onChange(props.options, action);
           }
+    
           return props.onChange(selected, action);
         }}
       />

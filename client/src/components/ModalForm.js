@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 const {findMatchingDates} = require('../helpers.js/MatchingDateRange');
 
-const MyForm = ({speciesListAll, setSeasonSpeciesList}) => {
+const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => {
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
   const [radioValue, setRadioValue] = useState('');
@@ -18,10 +18,10 @@ const MyForm = ({speciesListAll, setSeasonSpeciesList}) => {
   };
 
   const handleRadioChange = (e) => {
-    console.log("radio value: ", e.target.id)
+    // console.log("radio value: ", e.target.id)
     let arrMonths = e.target.id.split("-")
 
-    console.log("arrMonths: ", arrMonths)
+    // console.log("arrMonths: ", arrMonths)
 
     if(arrMonths.length > 0) {
       setStartMonth(arrMonths[0])
@@ -39,14 +39,63 @@ const MyForm = ({speciesListAll, setSeasonSpeciesList}) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Start Year:', startYear);
-    console.log('End Year:', endYear);
-    console.log('start month:', startMonth)
-    console.log('End month:', endMonth)
+    // console.log('Start Year:', startYear);
+    // console.log('End Year:', endYear);
+    // console.log('start month:', startMonth)
+    // console.log('End month:', endMonth)
 
     const MyNewSpecies = findMatchingDates(speciesListAll, startYear, endYear, startMonth, endMonth)
 
     setSeasonSpeciesList(MyNewSpecies);
+
+          
+    let sum = MyNewSpecies.length;
+
+
+    const frequency = {};
+    for (let item of MyNewSpecies) {
+      const key = item['ScientificNameKey'];
+      if (!frequency[key]) {
+        frequency[key] = 0;
+      }
+      frequency[key]++;
+    }
+  
+    const result = [];
+
+
+    for (let item of MyNewSpecies) {
+      const key = item['ScientificNameKey'];
+      const frequencyValue = frequency[key] > 1 ? frequency[key] : 1;
+      const percentageFreq = ((frequencyValue/sum)*100).toFixed(2);
+
+      result.push({
+        'ScientificName': key,
+        'CommonName': item['CommonName'],
+        'Frequency': frequencyValue,
+        'Percentage': percentageFreq,
+        'TaxonomicOrder': item['TaxonomicOrder']
+      });
+    }
+  
+
+    // console.log("result: ", result);
+
+    const newResult = Object.values(result.reduce((acc, obj) => {
+        const key = obj.ScientificName; // the key that we want to check for duplicates
+      
+        if (!acc[key]) {
+          // if the key does not exist, add the object to the accumulator
+          acc[key] = obj;
+        }
+      
+        return acc;
+    }, {}));
+
+    // console.log("my sum: ", sum);
+    // console.log("new arr og objs: ", newResult)
+
+    setSeasonSpeciesAcc(newResult)
   };
 
   const [show, setShow] = useState(false);

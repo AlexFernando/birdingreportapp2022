@@ -2,20 +2,17 @@ import React, {useState , useEffect} from 'react';
 
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import allSpecies from './allSpecies.json'
-import audioRecordedJson from './writtenFiles/audioRecorded.jsonld'
-import onlyHeardDataJson from './writtenFiles/onlyHeard.jsonld'
-import heardData from './MyHeardSpecies.json'
-import heardDataJson from './writtenFiles/allHeardSpecies.jsonld'
-import heardGlimplsedJson from './writtenFiles/heardAndGlimpsed.jsonld'
-import glimpsedJson from './writtenFiles/glimpsed.jsonld'
-import heardSeenData from './MyHeardSeenSpecies.json'
-import heardSeenJson from './writtenFiles/heardSeenSpecies.jsonld'
-import noObsDetailsData from './noObsDetailsSpecies.json'
-import seenJson from './writtenFiles/noObsDetailsObj.jsonld'
-import noFilterJson from './writtenFiles/noFilterObj.jsonld'
+// import audioRecordedJson from './writtenFiles/audioRecorded.jsonld'
+// import onlyHeardDataJson from './writtenFiles/onlyHeard.jsonld'
+// import heardDataJson from './writtenFiles/allHeardSpecies.jsonld'
+// import heardGlimplsedJson from './writtenFiles/heardAndGlimpsed.jsonld'
+// import glimpsedJson from './writtenFiles/glimpsed.jsonld'
+// import heardSeenJson from './writtenFiles/heardSeenSpecies.jsonld'
+// import seenJson from './writtenFiles/noObsDetailsObj.jsonld'
+// import noFilterJson from './writtenFiles/noFilterObj.jsonld'
 
-import regionData from './writtenFiles/RegionsAlternative.jsonld'
+// import regionData from './writtenFiles/RegionsAlternative.jsonld'
+
 import styled, { css } from 'styled-components'
 
 /**Bootstrap calls */
@@ -36,9 +33,6 @@ const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 
 const animatedComponents = makeAnimated();
 
-
-
-
 let CountryOptions = [
   {value: "PE-" , label: "Perú"},
   {value: "CO-" , label: "Colombia"},
@@ -47,7 +41,7 @@ let CountryOptions = [
   {value: "CL-", label: "Chile"}, 
   {value: "UY-", label: "Uruguay"}, 
   {value: "FK-", label: "Falkland Islands (Malvinas)"}, 
-  {value: "AQ" , label: "Antartica"}, 
+  {value: "AQ-" , label: "Antartica"}, 
   {value: "XX-" , label: "High Seas"}
 
 ]
@@ -67,81 +61,123 @@ const AnimatedMulti = ({getSpecies}) => {
   const [allDataRegion, setAllDataRegion] = useState([]);
 
   useEffect(() => {
-    async function fetchDataZero() {
-      const response = await fetch(audioRecordedJson);
-      const data = await response.json();
-      setAudioRecordedData(data);
-    }
-
-    fetchDataZero();
-
-    async function fetchData() {
-      const response = await fetch(onlyHeardDataJson);
-      const data = await response.json();
-      setOnlyHeardData(data);
-    }
-
-    fetchData();
-
-    async function fetchDataOne() {
-      const response = await fetch(heardDataJson);
-      const data = await response.json();
-      setAllHeardDataJson(data);
-    }
-
-    fetchDataOne();
-
-    async function fetchDataTwo() {
-      const response = await fetch(heardGlimplsedJson);
-      const data = await response.json();
-      setHeardAndGlimpsedJson(data);
-    }
-
-    fetchDataTwo();
-
-    async function fetchDataThree() {
-      const response = await fetch(glimpsedJson);
-      const data = await response.json();
-      setOnlyGlimpsedJson(data);
-    }
-
-    fetchDataThree();
-
-    async function fetchDataFour() {
-      const response = await fetch(heardSeenJson);
-      const data = await response.json();
-      setHeardAndSeenJson(data);
-    }
-
-    fetchDataFour();
-
-    async function fetchDataFive() {
-      const response = await fetch(seenJson);
-      const data = await response.json();
-      setOnlySeen(data);
-    }
-
-    fetchDataFive();
-
-    async function fetchDataSix() {
-      const response = await fetch(noFilterJson);
-      const data = await response.json();
-      setNoFilter(data);
-    }
-
-    fetchDataSix();
-
-    async function fetchDataRegion() {
-      const response = await fetch(regionData);
-      const data = await response.json();
-      setAllDataRegion(data);
-    }
-
-    fetchDataRegion();
+    console.log('antes de importar los files')
+    Promise.all([
+      import('./writtenFiles/audioRecorded.jsonld'),
+      import('./writtenFiles/onlyHeard.jsonld'),
+      import('./writtenFiles/allHeardSpecies.jsonld'),
+      import('./writtenFiles/heardAndGlimpsed.jsonld'),
+      import('./writtenFiles/glimpsed.jsonld'),
+      import('./writtenFiles/heardSeenSpecies.jsonld'),
+      import('./writtenFiles/noObsDetailsObj.jsonld'),
+      import('./writtenFiles/noFilterObj.jsonld'),
+      import('./writtenFiles/RegionsAlternative.jsonld')
+    ])
+      .then(async data => {
+        const audioRecordedData = await fetch(data[0].default).then(res => res.json());
+        const onlyHeardData = await fetch(data[1].default).then(res => res.json());
+        const allHeardDataJson = await fetch(data[2].default).then(res => res.json());
+        const heardAndGlimpsedJson = await fetch(data[3].default).then(res => res.json());
+        const onlyGlimpsedJson = await fetch(data[4].default).then(res => res.json());
+        const heardAndSeenJson = await fetch(data[5].default).then(res => res.json());
+        const onlySeen = await fetch(data[6].default).then(res => res.json());
+        const noFilter = await fetch(data[7].default).then(res => res.json());
+        const RegionData = await fetch(data[8].default).then(res => res.json());
+  
+        setAudioRecordedData(audioRecordedData);
+        setOnlyHeardData(onlyHeardData);
+        setAllHeardDataJson(allHeardDataJson);
+        setHeardAndGlimpsedJson(heardAndGlimpsedJson);
+        setOnlyGlimpsedJson(onlyGlimpsedJson);
+        setHeardAndSeenJson(heardAndSeenJson);
+        setOnlySeen(onlySeen);
+        setNoFilter(noFilter);
+        setAllDataRegion(RegionData)
+      })
+      .catch(error => {
+        console.error(error);
+      });
+      console.log('despues de importar los files')
   }, []);
 
+
+
+  // useEffect(() => {
+  //   async function fetchDataZero() {
+  //     const response = await fetch(audioRecordedJson);
+  //     const data = await response.json();
+  //     setAudioRecordedData(data);
+  //   }
+
+  //   fetchDataZero();
+
+  //   async function fetchData() {
+  //     const response = await fetch(onlyHeardDataJson);
+  //     const data = await response.json();
+  //     setOnlyHeardData(data);
+  //   }
+
+  //   fetchData();
+
+  //   async function fetchDataOne() {
+  //     const response = await fetch(heardDataJson);
+  //     const data = await response.json();
+  //     setAllHeardDataJson(data);
+  //   }
+
+  //   fetchDataOne();
+
+  //   async function fetchDataTwo() {
+  //     const response = await fetch(heardGlimplsedJson);
+  //     const data = await response.json();
+  //     setHeardAndGlimpsedJson(data);
+  //   }
+
+  //   fetchDataTwo();
+
+  //   async function fetchDataThree() {
+  //     const response = await fetch(glimpsedJson);
+  //     const data = await response.json();
+  //     setOnlyGlimpsedJson(data);
+  //   }
+
+  //   fetchDataThree();
+
+  //   async function fetchDataFour() {
+  //     const response = await fetch(heardSeenJson);
+  //     const data = await response.json();
+  //     setHeardAndSeenJson(data);
+  //   }
+
+  //   fetchDataFour();
+
+  //   async function fetchDataFive() {
+  //     const response = await fetch(seenJson);
+  //     const data = await response.json();
+  //     setOnlySeen(data);
+  //   }
+
+  //   fetchDataFive();
+
+  //   async function fetchDataSix() {
+  //     const response = await fetch(noFilterJson);
+  //     const data = await response.json();
+  //     setNoFilter(data);
+  //   }
+
+  //   fetchDataSix();
+
+  //   async function fetchDataRegion() {
+  //     const response = await fetch(regionData);
+  //     const data = await response.json();
+  //     setAllDataRegion(data);
+  //   }
+
+  //   fetchDataRegion();
+  // }, []);
+
     // console.log("audio recorded", audioRecordedData)
-    // // console.log("onlyHeard: ", onlyHeardData);
+    // console.log("onlyHeard: ", onlyHeardData);
     // console.log("allheard: ", allHeardDataJson);
     // console.log("heard and glimpsed: ", heardAndGlimpsedJson);
     // console.log("Glimpsed: ", onlyGlimpsedJson);
@@ -326,7 +362,7 @@ const AnimatedMulti = ({getSpecies}) => {
             let locationOptionsFiltered = locationsFilteredByRegions.map(elem => {
               return { value: elem.LocationHeardKey, label: elem.LocationHeardKey}
             })
-
+            console.log("Entrando a elegir los nuevos choices locales")
             let newArrUserChoices = userChoice.length>0 && userChoice.map( elemChoice => {        
               const objLocName = locationOptionsFiltered.find( elem => elem.value === elemChoice.value)
     
@@ -342,6 +378,8 @@ const AnimatedMulti = ({getSpecies}) => {
 
             setLocationOptions(locationOptionsFiltered)
             setUserChoice(newArrUserChoices);
+
+            console.log("Saliendo de elegir los nuevos choices locales")
           }
   
           else {
@@ -368,7 +406,7 @@ const AnimatedMulti = ({getSpecies}) => {
 
 
       let choicesTakenOut = [];
-
+      console.log("entrando de construir array de data")
       console.log("en useEffect: ", userChoice)
       const arrScientificNames = userChoice.length>0 && userChoice.map( elemChoice => {        
           const objLocName = filterOption.find( elem => elem.LocationHeardKey === elemChoice.value)
@@ -395,92 +433,55 @@ const AnimatedMulti = ({getSpecies}) => {
 
       }
 
-      // if(choicesTakenOut.length>0){
-      //   setUserChoice(userChoice.pop())
+      console.log("total arrays: ", totalArrays)
+      console.log("saliendo de construir array de data")
+      
+    let sum = totalArrays.length;
 
-      // }
 
-      // console.log("state userChoice: ", userChoice)
-    
-      // if(choicesTakenOut.length > 0){
-      //   console.log("mi length es mayor a 1")
-      //   const choicesLocationsFiltered = userChoice.length>0 && userChoice.map( elemUserChoice => {
-      //     return choicesTakenOut.find( elemTakenOut => elemTakenOut.value !== elemUserChoice.value);
-      //   })
-
-      //   console.log("choices to take out : ", choicesLocationsFiltered)
+    const frequency = {};
+    for (let item of totalArrays) {
+      const key = item['ScientificNameKey'];
+      if (!frequency[key]) {
+        frequency[key] = 0;
+      }
+      frequency[key]++;
+    }
   
-      //   setUserChoice(choicesLocationsFiltered);
-        
-      // }
+    const result = [];
 
-      // console.log("arrScientificName : ", arrScientificNames);
-      // console.log("New Scientific Names: ", totalArrays);
 
-      let mySum = 0;
+    for (let item of totalArrays) {
+      const key = item['ScientificNameKey'];
+      const frequencyValue = frequency[key] > 1 ? frequency[key] : 1;
+      const percentageFreq = ((frequencyValue/sum)*100).toFixed(2);
+
+      result.push({
+        'ScientificName': key,
+        'CommonName': item['CommonName'],
+        'Frequency': frequencyValue,
+        'Percentage': percentageFreq,
+        'TaxonomicOrder': item['TaxonomicOrder']
+      });
+    }
+  
+
+    console.log("result: ", result);
+
+    const newResult = Object.values(result.reduce((acc, obj) => {
+        const key = obj.ScientificName; // the key that we want to check for duplicates
       
-    //   if(arrScientificNames.length > 0) {
-
-    //     const totalArrays = arrScientificNames.reduce( (acc, curr) => {
-    //       acc = acc.concat(curr);
-    //       return acc
-    //     })
-
+        if (!acc[key]) {
+          // if the key does not exist, add the object to the accumulator
+          acc[key] = obj;
+        }
       
-    //     const newTotalMixedLocations = totalArrays.reduce( (acc, curr) => {
-    //       let index = acc.findIndex(singleObj => {
+        return acc;
+    }, {}));
 
-    //         if(curr && curr.name) {
-    //           return singleObj["name"] === curr["name"]
-    //         }
-
-    //       });
-
-    //       if (index >= 0) {
-            
-    //           let originalValue = acc[index]["value"];
-          
-    //           originalValue += curr["value"];
-       
-    //           // acc[index]["value"] = originalValue;
-
-    //           acc[index] = Object.assign({}, acc[index], { value: originalValue });
-    //       }  
-
-    //       else {
-    //           // acc.push(curr);
-    //           acc.push(Object.assign({}, curr));
-    //       }
-      
-    //       return acc;
-    //     }, []);
-
-    //     newTotalMixedLocations.map( elem => {
-    //         if( elem && elem.value){
-    //           mySum += elem['value']
-    //         }
-
-    //     })
-
-    //     const LocationsPercentageSpecies = newTotalMixedLocations.map( elem => {
-    //       if( elem && elem.value){
-    //         let percentageFrequencySp = ((elem['value']/mySum)*100).toFixed(2);
-    //         elem['valuePercentage'] = percentageFrequencySp;
-
-    //         return elem;
-    //       }
-          
-    //     })
-    
-    //   getSpecies(LocationsPercentageSpecies);
-    //   getSpeciesSum(mySum);
-    // }    
-    
-    // else {
-    //   getSpecies([]);
-    // }
-
-    getSpecies(totalArrays)
+    console.log("my sum: ", sum);
+    console.log("new arr og objs: ", newResult)
+    getSpecies(totalArrays, newResult);
   
     },[userChoice, filterOption])
   
