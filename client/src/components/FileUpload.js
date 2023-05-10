@@ -37,24 +37,32 @@ const FileUpload = () => {
           'Content-Type': 'multipart/form-data'
         },
         onUploadProgress: progressEvent => {
+          console.log("progressEvent: ", progressEvent, "loaded: ", progressEvent.loaded, "total: ", progressEvent.total)
           setUploadPercentage(
             parseInt(
               Math.round((progressEvent.loaded * 100) / progressEvent.total)
             )
           );
 
-          // Clear percentage
-          setTimeout(() => setUploadPercentage(0), 5000);
+          if(progressEvent.loaded === progressEvent.total) {
+            console.log("Next")
+            setTimeout(() => setUploadPercentage(0), 2000);
+      
+            setTimeout(() =>  setUploadedFile('uploaded'),3000);
+           
+            setMessage('Your file has been Uploaded');
+            
+            setTimeout(() =>  setMessage('In order to generate your report, you need to enter the correct dates with the format mm/dd/yyyy.'), 3000);
+      
+          }
         }
       });
 
       const {fileName} = res.data;
 
-      setTimeout(() =>  setUploadedFile('uploaded'), 6000);
-     
-      setMessage('Your file has been Uploaded');
-      
-      setTimeout(() =>  setMessage('In order to generate your report, you need to enter the correct dates with the format mm/dd/yyyy.'), 6000);
+      // Clear percentage
+
+  
 
 
     } catch (err) {
