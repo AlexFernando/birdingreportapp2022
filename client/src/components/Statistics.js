@@ -87,13 +87,13 @@ const StatisticsComponent = () => {
     const handleFrequencyAscending = () => {
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => a.Frequency - b.Frequency))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => a.Frequency - b.Frequency))
-        setTagFilter('Frequency Ascending Order')
+        setTagFilter('Frequency Descending Order')
     }
 
     const handleFrequencyDescending = () => {
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => b.Frequency - a.Frequency))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => b.Frequency - a.Frequency))
-        setTagFilter('Frequency Descending Order')
+        setTagFilter('Frequency Acscending Order')
     }
 
     const handleDateDescending = () => {
@@ -156,16 +156,21 @@ const StatisticsComponent = () => {
                     id="dropdown-variants"
                     title="Order By"
                 >
-                    <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Descending Taxonomic Order</Dropdown.Item>
-                    <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Ascending Taxonomic Order</Dropdown.Item>
+                    <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Ascending Taxonomic Order</Dropdown.Item>
+                    <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Descending Taxonomic Order</Dropdown.Item>
                     <Dropdown.Item eventKey="3" onClick = {handleAlphabeticOrder}>Alphabetic</Dropdown.Item>        
                     <Dropdown.Item eventKey="4" onClick = {handleFrequencyAscending}>Frequency Ascending Order</Dropdown.Item>     
-                    <Dropdown.Item eventKey="5" onClick = {handleFrequencyDescending}>Frequency Desscending Order</Dropdown.Item>    
+                    <Dropdown.Item eventKey="5" onClick = {handleFrequencyDescending}>Frequency Descending Order</Dropdown.Item>    
                     <Dropdown.Item eventKey="6" onClick = {handleDateDescending}>Newest Date</Dropdown.Item>   
                     <Dropdown.Item eventKey="7" onClick = {handleDateAscending}>Oldest Date</Dropdown.Item>       
                 </DropdownButton>
 
-                <p><span>{check}</span>{tagFilter}</p>
+                {
+                    tagFilter === '' ? 
+                        <p>No filter Selected</p>
+                    :
+                        <p><span>{check}</span>{tagFilter}</p>
+                }
             </FilterContainer>
 
          

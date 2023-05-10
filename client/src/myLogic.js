@@ -291,150 +291,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         })
 
-        // console.log("arrHeardSpecies: ", arrHeardSpecies);
-
-
-        // console.log("arrOnlyHeardSpecies: ", arrOnlyHeardSpecies)
-
-        // arrAudioRecordedTotal.map(elem => console.log(elem.LocationHeardKey))
-
-
-        //ARRAY OF HEARD SPECIES , FOR STATITISCS
-        // let arrMergedHeardSpecies  = arrHeardSpecies.reduce( (accumulator ,curr) => {
-
-        //     // console.log("accum: ", accumulator, "curr: ", curr)
-        //  // Get the index of the key-value pair.
-        //     let occurs = accumulator.reduce(function(n, item, i) {
-        //         // console.log("n: ", n, "item: ", item, "i: ", i)
-        //         return (item.LocationHeardKey === curr.LocationHeardKey) ? i : n;
-        //     }, -1);
-
-        //       // If the name is found,
-        //     if (occurs >= 0) {
-
-        //         // append the current value to its list of values.
-        //         accumulator[occurs].ScientificNameKey = accumulator[occurs].ScientificNameKey.concat(curr.ScientificNameKey);
-        //         accumulator[occurs].CommonName = accumulator[occurs].CommonName.concat(curr.CommonName);
-        //         // Otherwise,
-        //     } else {
-
-        //         // add the current item to o (but make sure the value is an array).
-        //         let obj = {
-        //             LocationHeardKey: curr.LocationHeardKey,
-        //             ScientificNameKey: curr.ScientificNameKey,
-        //             CommonName : curr.CommonName,
-        //             Region : curr.Region,
-        //         };
-        //         accumulator = accumulator.concat([obj]);
-        //     }
-
-        //     return accumulator;
-        // }, [])
-
-        // let arrMergedHeardSpecies = arrHeardSpecies.reduce((accumulator, curr) => {
-        //     let occurs = accumulator.findIndex((item) => item.LocationHeardKey === curr.LocationHeardKey);
-        //     if (occurs >= 0) {
-        //       // If the location is already in the array, push the scientific and common name to its nested array.
-        //       accumulator[occurs].species.push({
-        //         ScientificNameKey: curr.ScientificNameKey,
-        //         CommonName: curr.CommonName,
-        //         MyDate: curr.Date,
-        //         Count: curr.CountNew,
-        //         TaxonomicOrder: curr.TaxonomicOrder,
-        //         Location: curr.LocationHeardKey
-        //       });
-        //     } else {
-        //       // Otherwise, add a new object to the array.
-        //       let obj = {
-        //         LocationHeardKey: curr.LocationHeardKey,
-        //         species: [
-        //           {
-        //             ScientificNameKey: curr.ScientificNameKey,
-        //             CommonName: curr.CommonName,
-        //             MyDate: curr.Date,
-        //             Count: curr.CountNew,
-        //             TaxonomicOrder: curr.TaxonomicOrder,
-        //             Location: curr.LocationHeardKey
-        //           },
-        //         ],
-        //         Region: curr.Region,
-        //       };
-        //       accumulator.push(obj);
-        //     }
-        //     return accumulator;
-        //   }, []);
-
-        //   let arrMergedAudioRecorded = arrAudioRecordedTotal.reduce((accumulator, curr) => {
-        //     let occurs = accumulator.findIndex((item) => item.LocationHeardKey === curr.LocationHeardKey);
-        //     if (occurs >= 0) {
-        //       // If the location is already in the array, push the scientific and common name to its nested array.
-        //       accumulator[occurs].species.push({
-        //         ScientificNameKey: curr.ScientificNameKey,
-        //         CommonName: curr.CommonName,
-        //         MyDate: curr.Date,
-        //         Count: curr.CountNew,
-        //         TaxonomicOrder: curr.TaxonomicOrder,
-        //         Location: curr.LocationHeardKey,
-        //         SubmissionID: curr['Submission ID']
-        //       });
-        //     } else {
-        //       // Otherwise, add a new object to the array.
-        //       let obj = {
-        //         LocationHeardKey: curr.LocationHeardKey,
-        //         species: [
-        //           {
-        //             ScientificNameKey: curr.ScientificNameKey,
-        //             CommonName: curr.CommonName,
-        //             MyDate: curr.Date,
-        //             Count: curr.CountNew,
-        //             TaxonomicOrder: curr.TaxonomicOrder,
-        //             Location: curr.LocationHeardKey,
-        //             SubmissionID: curr['Submission ID']
-        //           },
-        //         ],
-        //         Region: curr.Region,
-        //       };
-        //       accumulator.push(obj);
-        //     }
-        //     return accumulator;
-        //   }, []);
-          
-        // console.log(arrMergedHeardSpecies);
-
-        // arrMergedHeardSpecies.map( objElem => {            
-        //     let ocurrences = objElem.ScientificNameKey.map( (itemScientificName, idx) => ({name: itemScientificName, value: 1, CommonName: objElem.CommonName[idx]}))
-
-        //     objElem.ScientificNameKey = ocurrences;
-        // })
-
-        // arrMergedHeardSpecies.map( item => {
-        //     let newMergedHeardSpecies = item.ScientificNameKey.reduce( (acc, curr) => {
-        //         const index = acc.findIndex(singleObj => {
-        //             return singleObj["name"] === curr["name"]
-        //         });
-    
-        //         if (index >= 0) {
-        //             var originalValue = acc[index]["value"];
-        //             originalValue += curr["value"];
-        //             acc[index]["value"] = originalValue;
-        //         }  
-    
-        //         else {
-        //             acc.push(curr);
-        //         }
-            
-        //         return acc;
-        //     }, []);
-
-        //     item.ScientificNameKey = newMergedHeardSpecies
-
-        //     delete item.CommonName;
-        // }) 
-
-        // let audioRecordedBuildArr =  buildObjFile.buildObjData(arrAudioRecordedTotal)
-        
-
-        //END ARRAY OF HEARD SPECIES , FOR STATITISCS
     
         //2.- modoficar elem.category el ';' por '&& o algo asi'
 
@@ -741,7 +597,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         if(elem === 'duplicate'){
                             countDuplicates++;
                         }
-    
+                        //HJACER UNA CONDICION PARA CUANDO COUNTDUPLICATES ES 0, Y COLOCAR (1)
                         else {
                             if(countDuplicates !== 0) {
                                 uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
@@ -1026,8 +882,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         )
 
-        
-
         // START create the arrays of form and groups that does not have specie associated
 
         let countGroupMatch = 0;
@@ -1184,7 +1038,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
 
             else {
-                pObj.addText(familyName, { bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
+                pObj.addText(familyName, { bold: true, color: 'a84a04', font_face: 'Calibri', font_size: 16 })
                 pObj.addLineBreak()
             }
     

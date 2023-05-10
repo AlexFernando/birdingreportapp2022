@@ -34,7 +34,7 @@ const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
 const animatedComponents = makeAnimated();
 
 let CountryOptions = [
-  {value: "PE-" , label: "Perú"},
+  {value: "PE-" , label: "Peru"},
   {value: "CO-" , label: "Colombia"},
   {value: "EC-" , label: "Ecuador"},
   {value: "AR-" , label: "Argentina"},
@@ -499,18 +499,22 @@ const AnimatedMulti = ({getSpecies}) => {
             title="Filter By"
         >
             <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Audio Recorded')} >Audio Recorded</Dropdown.Item>
-            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Only Heard')} >Only Heard</Dropdown.Item>
+            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Only Heard')} >Heard Only</Dropdown.Item>
             <Dropdown.Item eventKey="3" onClick={() => handleFilterOptionClick('Heard Included')} >Heard Included</Dropdown.Item>
             <Dropdown.Item eventKey="4" onClick={() => handleFilterOptionClick('Heard and Glimpsed')} >Heard and Glimpsed</Dropdown.Item>
-            <Dropdown.Item eventKey="5" onClick={() => handleFilterOptionClick('Glimpsed')} >Glimpsed</Dropdown.Item>
+            <Dropdown.Item eventKey="5" onClick={() => handleFilterOptionClick('Glimpsed')} >Glimpsed Only</Dropdown.Item>
             <Dropdown.Item eventKey="6" onClick={() => handleFilterOptionClick('Heard and Seen')} >Heard and Seen</Dropdown.Item>
             <Dropdown.Item eventKey="7" onClick={() => handleFilterOptionClick('Only Seen')} >Only Seen</Dropdown.Item>
             <Dropdown.Item eventKey="8" onClick={() => handleFilterOptionClick('All Type of Obervations')} >All Type Of Observations</Dropdown.Item>
     
         </DropdownButton>
-
-        <p><span>{check}</span>{tagFilterData}</p>
-
+        {
+          tagFilterData === '' ? 
+            <p>No filter Selected</p>
+          :
+            <p><span>{check}</span>{tagFilterData}</p>
+        }
+        
         </FilterContainer>
 
         <SelectContainer>

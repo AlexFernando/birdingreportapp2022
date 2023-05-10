@@ -69,7 +69,7 @@ const UpdatePresencenData = () => {
                                  
                         
                     <div>
-                      <h4>Update Presencen data:</h4>
+                      <h4>Update Presence data:</h4>
                       <div className="row">
                         <div className="col-md-12">
                           <form onSubmit={onSubmit}>
