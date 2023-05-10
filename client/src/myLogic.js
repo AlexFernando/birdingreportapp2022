@@ -24,17 +24,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
     let excelConservationCodes = require('./excelConservationCode')//Conservation Code
 
-    // let excelCountryCodes = require('./codigoPaises') //countrycode
-
-    // let CountryCodeData = excelCountryCodes.codigoPaisesResults();
-
-    // const arrNewCountryCode = CountryCodeData.map(elem => {
-    //     let FirstKey = elem['Sate/Province Name'] + ' '+ '('+elem['Country Name'] + ')'
-    //     let SecondKey = elem['Country Code']+'-'+ elem['State/Province Code'];
-
-    //     return  {"State/Province_name":FirstKey, "code": SecondKey}
-    // })
-
     console.log("filename: ", filename)
 
     let filenameUploaded = filename; 
@@ -92,7 +81,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         }
     });
       
-
+    return new Promise((resolve, reject) => {
     function filterData(results) {
     
         let count = 0;
@@ -118,6 +107,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
             console.log(
                 'Finish to create a Microsoft Word document.'
             )
+
+                    // Resolve the Promise with the filtered data after the file has been created
+        resolve(filteredData);
+
         })
     
         // Officegen calling this function to report errors:
@@ -1490,6 +1483,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         .then(result => filterData(result))
         .catch(error => console.log(error))
     
+    });
 }
 
 module.exports = {
