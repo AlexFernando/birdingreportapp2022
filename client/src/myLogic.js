@@ -109,7 +109,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             )
 
                     // Resolve the Promise with the filtered data after the file has been created
-        resolve(filteredData);
+        resolve(1);
 
         })
     
@@ -192,22 +192,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         // 1) codigo de abajo
         arrLocationsUpdated = cleanKeys.map( elem => {
 
-            //**NO filter array for stats*/
-
-            // let objNoFilter = {}
-
-            // objNoFilter['LocationHeardKey'] = elem['Location'];
-            // objNoFilter['ScientificNameKey'] = elem['Scientific Name'];
-            // objNoFilter['CommonName'] = elem['Common Name'];
-            // objNoFilter['Region'] = elem['State/Province'];
-            // objNoFilter['Comments'] = elem['Observation Details'];
-            // objNoFilter['CountNew'] = elem['Count']
-            // objNoFilter['TaxonomicOrder'] = elem['Taxonomic Order']
-            // objNoFilter['Date'] = elem['Date'];
-
-            // arrSpeciesNoFilter.push(objNoFilter);
-  
-            // console.log(elem);
             if( (!elem['Observation Details'].toLowerCase().includes('Glimpsed'.toLowerCase()) && !elem['Observation Details'].toLowerCase().includes('Sighting'.toLowerCase()) && elem['Observation Details'].toLowerCase().includes('Heard'.toLowerCase()) ) && ( !elem['Observation Details'].toLowerCase().includes('Seen'.toLowerCase()) || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === 'not') || (elem['Observation Details'].match(myRegexNot) && elem['Observation Details'].match(myRegexNot)[0] === `wasn't`)) || elem['Observation Details'].trim().toLowerCase() === 'H'.toLocaleLowerCase() || elem['Observation Details'].trim() === 'H.'.toLowerCase() ) {
 
                 if(elem['Observation Details'].match(subSpecieRegex)){

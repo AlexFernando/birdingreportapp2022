@@ -172,9 +172,13 @@ app.post('/dates', async (req, res) => {
 
   try {
     const filteredData = await myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
-    myDates["loading"] = '';
-    // Do something with the filtered data
-    res.json(myDates);
+    console.log("filteredData: ", filteredData)
+    if(filteredData === 1) {
+      myDates["loading"] = '';
+      // Do something with the filtered data
+      res.json(myDates);
+    }
+ 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
