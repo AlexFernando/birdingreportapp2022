@@ -495,7 +495,11 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
-                        if(countDuplicates !== 0) {
+                        if(countDuplicates === 0) {
+                            uniqueLocations[index] = elem + " (1) "
+                        }
+
+                        else if(countDuplicates !== 0) {
                             uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
                         }
 
@@ -572,7 +576,11 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         }
                         //HJACER UNA CONDICION PARA CUANDO COUNTDUPLICATES ES 0, Y COLOCAR (1)
                         else {
-                            if(countDuplicates !== 0) {
+                            if(countDuplicates === 0) {
+                                uniqueLocations[index] = elem + " (1) "
+                            }
+
+                            else if(countDuplicates !== 0) {
                                 uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
                             }
     
@@ -642,7 +650,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
-                        if(countDuplicates !== 0) {
+                        if(countDuplicates === 0) {
+                            uniqueLocations[index] = elem + " (1) "
+                        }
+                        else if(countDuplicates !== 0) {
                             uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
                         }
 
@@ -718,7 +729,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         }
     
                         else {
-                            if(countDuplicates !== 0) {
+                            if(countDuplicates === 0) {
+                                uniqueLocations[index] = elem + " (1) "
+                            }
+                            else if(countDuplicates !== 0) {
                                 uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
                             }
     
@@ -788,7 +802,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     }
 
                     else {
-                        if(countDuplicates !== 0) {
+                        if(countDuplicates === 0) {
+                            uniqueLocations[index] = elem + " (1) "
+                        }
+                        else if(countDuplicates !== 0) {
                             uniqueLocations[index] = elem + " ("+ (countDuplicates+1).toString() +") "
                         }
 
