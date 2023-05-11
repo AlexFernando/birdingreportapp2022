@@ -84,22 +84,39 @@ const FileUpload = () => {
 
  
   
-  const generate = async() => {
-    setMessage('We are processing all the data, your file will be ready in a few seconds ...')
-    setLoading('start loading');
+  // const generate = async() => {
+  //   setMessage('We are processing all the data, your file will be ready in a few seconds ...')
+  //   setLoading('start loading');
  
-    //aqui quiero hacer un htttp post enviando el state dates que contiene el dato
-    const res =  await axios.post('/dates', { 
-      myDates: dates, filename: filename})
-      .then(res => setLoading(res.data.loading))
-      .catch(err => console.log(err.data))
+  //   //aqui quiero hacer un htttp post enviando el state dates que contiene el dato
+  //   const res =  await axios.post('/dates', { 
+  //     myDates: dates, filename: filename})
+  //     .then(res => setLoading(res.data.loading))
+  //     .catch(err => console.log(err.data))
 
-    //setLoading(loadingKey);
-    setMessage('Thanks for your patience, your report is ready. Click on Download Button.')
-    setUploadedFile('');
-    setGeneratedFile('yes');
-    setDates({});
-  }
+  //   setMessage('Thanks for your patience, your report is ready. Click on Download Button.')
+  //   setUploadedFile('');
+  //   setGeneratedFile('yes');
+  //   setDates({});
+  // }
+
+  const generate = async () => {
+    setMessage('We are processing all the data, your file will be ready in a few seconds ...');
+    setLoading('start loading');
+  
+    try {
+      const res = await axios.post('/dates', {myDates: dates, filename: filename});
+      await res.data;
+      setLoading('');
+      setMessage('Thanks for your patience, your report is ready. Click on Download Button.');
+      setUploadedFile('');
+      setGeneratedFile('yes');
+      setDates({});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
 
   const onSubmitDownload = (e) => {
     e.preventDefault()
