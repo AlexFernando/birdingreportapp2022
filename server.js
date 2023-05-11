@@ -158,32 +158,32 @@ app.post('/updateconservationdata', (req, res) => {
 
 
 //este post para recibir el dato 
-// app.post('/dates', async (req, res) => {
-//   const myDates = req.body.myDates;
-//   const filename = req.body.filename;
-//   await myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
-//   myDates["loading"] = '';
-//   res.json(myDates)
-// })
-
 app.post('/dates', async (req, res) => {
   const myDates = req.body.myDates;
   const filename = req.body.filename;
+  myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
+  myDates["loading"] = '';
+  res.json(myDates)
+})
 
-  try {
-    const filteredData = await myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
-    console.log("filteredData: ", filteredData)
-    if(filteredData === 1) {
-      myDates["loading"] = '';
-      // Do something with the filtered data
-      res.json(myDates);
-    }
+// app.post('/dates', async (req, res) => {
+//   const myDates = req.body.myDates;
+//   const filename = req.body.filename;
+
+//   try {
+//     const filteredData = await myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
+//     console.log("filteredData: ", filteredData)
+//     if(filteredData === 1) {
+//       myDates["loading"] = '';
+//       // Do something with the filtered data
+//       res.json(myDates);
+//     }
  
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
 
 
 // write the stats docx.

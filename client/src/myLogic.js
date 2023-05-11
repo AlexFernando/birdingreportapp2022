@@ -81,7 +81,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         }
     });
       
-    return new Promise((resolve, reject) => {
     function filterData(results) {
     
         let count = 0;
@@ -107,9 +106,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
             console.log(
                 'Finish to create a Microsoft Word document.'
             )
-
-                    // Resolve the Promise with the filtered data after the file has been created
-        resolve(1);
 
         })
     
@@ -1467,7 +1463,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
         .then(result => filterData(result))
         .catch(error => console.log(error))
     
-    });
+    
 }
 
 module.exports = {

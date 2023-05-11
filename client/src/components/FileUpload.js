@@ -84,38 +84,59 @@ const FileUpload = () => {
 
  
   
-  // const generate = async() => {
-  //   setMessage('We are processing all the data, your file will be ready in a few seconds ...')
-  //   setLoading('start loading');
- 
-  //   //aqui quiero hacer un htttp post enviando el state dates que contiene el dato
-  //   const res =  await axios.post('/dates', { 
-  //     myDates: dates, filename: filename})
-  //     .then(res => setLoading(res.data.loading))
-  //     .catch(err => console.log(err.data))
-
-  //   setMessage('Thanks for your patience, your report is ready. Click on Download Button.')
-  //   setUploadedFile('');
-  //   setGeneratedFile('yes');
-  //   setDates({});
-  // }
-
-  const generate = async () => {
-    setMessage('We are processing all the data, your file will be ready in a few seconds ...');
+  const generate = async() => {
+    setMessage('We are processing all the data, your file will be ready in a few seconds ...')
     setLoading('start loading');
+ 
+    //aqui quiero hacer un htttp post enviando el state dates que contiene el dato
+    const res =  await axios.post('/dates', { 
+      myDates: dates, filename: filename})
+      .then(res => console.log(res.data.loading))
+      // .then(res => setLoading(res.data.loading))
+      .catch(err => console.log(err.data))
+    
+      const initialYear = new Date(dates.initialDate).getFullYear();
+      const endYear = new Date(dates.endDate).getFullYear();
+      const yearDiff = endYear - initialYear;
+    
+      if (yearDiff <= 1) {
+        const timeout = 30000 + (yearDiff * 30000);
+        setTimeout(() => {
+          setLoading('')
+          setMessage('Thanks for your patience, your report is ready. Click on Download Button.')
+          setUploadedFile('');
+          setGeneratedFile('yes');
+          setDates({});
+        }, timeout);
+      } else {
+        const timeout = 80000 + ((yearDiff - 2) * 40000);
+        setTimeout(() => {
+          setLoading('')
+          setMessage('Thanks for your patience, your report is ready. Click on Download Button.')
+          setUploadedFile('');
+          setGeneratedFile('yes');
+          setDates({});
+        }, timeout);
+      }
+    console.log("dates: ",dates);
+  }
+
+  // const generate = async () => {
+  //   setMessage('We are processing all the data, your file will be ready in a few seconds ...');
+  //   setLoading('start loading');
   
-    try {
-      const res = await axios.post('/dates', {myDates: dates, filename: filename});
-      await res.data;
-      setLoading('');
-      setMessage('Thanks for your patience, your report is ready. Click on Download Button.');
-      setUploadedFile('');
-      setGeneratedFile('yes');
-      setDates({});
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //   try {
+  //     const res = await axios.post('/dates', {myDates: dates, filename: filename});
+  //     await res.data;
+  //     setLoading('');
+  //     setMessage('Thanks for your patience, your report is ready. Click on Download Button.');
+  //     setUploadedFile('');
+  //     setGeneratedFile('yes');
+  //     setDates({});
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
   
 
   const onSubmitDownload = (e) => {
