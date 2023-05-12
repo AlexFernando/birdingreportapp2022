@@ -245,12 +245,12 @@ const AnimatedMulti = ({getSpecies}) => {
             setUserChoice(updatedChoices)
             setTagFilterData("Audio Recorded")
             break;
-          case 'Only Heard':
+          case 'Heard Only':
             // console.log("userChoice Heard Data: ", userChoice)
             setFilterOptions(onlyHeardData)
             const updatedChoicesOne = handleChoicesOnFilterOption(userChoice, onlyHeardData);
             setUserChoice(updatedChoicesOne)
-            setTagFilterData("Only Heard")
+            setTagFilterData("Heard Only")
             break;
           
           case 'Heard Included': 
@@ -499,7 +499,7 @@ const AnimatedMulti = ({getSpecies}) => {
             title="Filter By"
         >
             <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Audio Recorded')} >Audio Recorded</Dropdown.Item>
-            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Only Heard')} >Heard Only</Dropdown.Item>
+            <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Heard Only')} >Heard Only</Dropdown.Item>
             <Dropdown.Item eventKey="3" onClick={() => handleFilterOptionClick('Heard Included')} >Heard Included</Dropdown.Item>
             <Dropdown.Item eventKey="4" onClick={() => handleFilterOptionClick('Heard and Glimpsed')} >Heard and Glimpsed</Dropdown.Item>
             <Dropdown.Item eventKey="5" onClick={() => handleFilterOptionClick('Glimpsed')} >Glimpsed Only</Dropdown.Item>

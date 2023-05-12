@@ -65,7 +65,7 @@ const StatisticsComponent = () => {
         setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => b.TaxonomicOrder - a.TaxonomicOrder))
-        setTagFilter('Descending Taxonomic Order')
+        setTagFilter('Ascending Taxonomic Order')
     }
     
     const handleAscendingOrder = () => {
@@ -73,7 +73,7 @@ const StatisticsComponent = () => {
         setSeasonSpeciesList([...seasonSpeciesList].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => a.TaxonomicOrder - b.TaxonomicOrder))
-        setTagFilter('Ascending Taxonomic Order')
+        setTagFilter('Descending Taxonomic Order')
     }
 
     const handleAlphabeticOrder = () => {
@@ -87,13 +87,13 @@ const StatisticsComponent = () => {
     const handleFrequencyAscending = () => {
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => a.Frequency - b.Frequency))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => a.Frequency - b.Frequency))
-        setTagFilter('Frequency Descending Order')
+        setTagFilter('Frequency Ascending Order')
     }
 
     const handleFrequencyDescending = () => {
         setSpeciesAccumulated([...speciesAccumulated].sort((a,b) => b.Frequency - a.Frequency))
         setSeasonSpeciesAcc([...seasonSpeciesAcc].sort((a,b) => b.Frequency - a.Frequency))
-        setTagFilter('Frequency Acscending Order')
+        setTagFilter('Frequency Descending Order')
     }
 
     const handleDateDescending = () => {
