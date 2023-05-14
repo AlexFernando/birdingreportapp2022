@@ -37,18 +37,19 @@ const UpdateRestrictionData = () => {
               );
     
               // Clear percentage
-              setTimeout(() => setUploadPercentage(0), 5000);
+              if(progressEvent.loaded === progressEvent.total) {
+        
+                setTimeout(() => setUploadPercentage(0), 2000);
+          
+                setTimeout(() =>  setUploadedFile('uploaded'),3000);
+              
+                setMessage('Your file has been Uploaded');
+          
+              }
             }
           });
     
           const {fileName} = res.data;
-    
-          setTimeout(() =>  setUploadedFile('uploaded'), 6000);
-         
-          setMessage('Your file has been Uploaded');
-          
-          setTimeout(() =>  setMessage('Your file containning Restriction data has been updated.'), 6000);
-    
     
         } catch (err) {
           if (err.response.status === 500) {
