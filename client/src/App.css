@@ -2,3 +2,7 @@ img {
     width: 270px;
     height: 270px;
 }
+
+.dropdown-toggle .btn-primary{
+    background-color: #a84a04;
+  }

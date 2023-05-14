@@ -93,6 +93,7 @@ const UpdateMainData = () => {
                                 type='submit'
                                 value='Upload'
                                 className='btn btn-primary mt-4'
+                                style={{ backgroundColor: '#a84a04', borderColor: '#a84a04' }}
                               />
                             </div>
                           </form>

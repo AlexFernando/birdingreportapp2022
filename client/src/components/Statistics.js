@@ -176,9 +176,9 @@ const StatisticsComponent = () => {
          
                 <MyForm speciesListAll={speciesList} setSeasonSpeciesList={setSeasonSpeciesList} setSeasonSpeciesAcc={setSeasonSpeciesAcc}/>
 
-                <Button className="ml-2" variant="primary" type="submit"  onClick={handleResetDates}>
+                <ButtonCustom className="ml-2" variant="primary" type="submit"  onClick={handleResetDates}>
                     Reset Dates
-                </Button>
+                </ButtonCustom>
 
                 <ListContainer>
                     <ListItem active={activeItem === 0} onClick={() => handleItemClick(0)}>Disaggregated Data</ListItem>
@@ -454,4 +454,9 @@ const ListItem = styled.li`
     color: ${props => (props.active ? "#0c0c0c" : "#a6a6a6")};
     border-bottom: ${props => props.active ? "2px solid #0c0c0c": "unset"};
 
+`
+
+const ButtonCustom = styled(Button)`
+  background-color: #a84a04;
+  border-color: #a84a04;
 `

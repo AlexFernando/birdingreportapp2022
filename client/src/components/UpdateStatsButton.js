@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button} from 'react-bootstrap';
+import styled from 'styled-components';
 import Spinner from './Spinner'
 
 function FileReadingComponent() {
@@ -22,10 +23,15 @@ function FileReadingComponent() {
 
   return (
     <div>
-      <Button onClick={handleClick}>Update Stats</Button>
+      <ButtonCustom onClick={handleClick}>Update Stats</ButtonCustom>
       {isLoading && <Spinner /> }
     </div>
   );
 }
+
+const ButtonCustom = styled(Button)`
+  background-color: #a84a04;
+  border-color: #a84a04;
+`
 
 export default FileReadingComponent;

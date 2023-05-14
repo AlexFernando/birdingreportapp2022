@@ -25,6 +25,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import MyCustomSelect from './MyCustomSelect';
 
+import customSyles from '../App.css'
+
 
 /**IMPORT REACT SELECT */
 
@@ -497,6 +499,7 @@ const AnimatedMulti = ({getSpecies}) => {
             key="niceFilter"
             id="dropdown-variants"
             title="Filter By"
+            className = {customSyles}
         >
             <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Audio Recorded')} >Audio Recorded</Dropdown.Item>
             <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Heard Only')} >Heard Only</Dropdown.Item>
@@ -572,6 +575,12 @@ const SelectContainer = styled.div`
       margin-top: 2rem;
     }
 `
+
+const CustomDropdownButton = styled(DropdownButton)`
+ 
+    background-color: #a84a04;
+  
+`;
 
 
 

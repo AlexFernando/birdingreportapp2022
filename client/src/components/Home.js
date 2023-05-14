@@ -6,8 +6,8 @@ import '../App.css';
 
 const Home = () => {
 
-    const bird = <FontAwesomeIcon icon={faDove} size="xs" color="#007bff" />
-
+    const bird = <FontAwesomeIcon icon={faDove} size="xs" color="#a84a04" />
+ 
     return(
         <div className = "container mt-4">
         <h4 className="display-4 text-center mb-4">

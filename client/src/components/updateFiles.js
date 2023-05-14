@@ -9,7 +9,7 @@ import UpdateConservationData from './UpdateConservationData'
 
 const UpdateFiles = () => {
 
-    const bird = <FontAwesomeIcon icon={faDove} size="xs" color="#007bff" />
+    const bird = <FontAwesomeIcon icon={faDove} size="xs" color="#a84a04" />
 
     return(
         <div className = "container mt-4">

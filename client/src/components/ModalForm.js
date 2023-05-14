@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import styled from 'styled-components';
 const {findMatchingDates} = require('../helpers.js/MatchingDateRange');
 
 const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => {
@@ -109,9 +110,9 @@ const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => 
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <ButtonCustom onClick={handleShow}>
         Change Dates
-      </Button>
+      </ButtonCustom>
 
       {/* <Button className="ml-2" variant="primary" type="submit"  onClick={handleResetDates}>
                     Reset Dates
@@ -261,4 +262,8 @@ const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => 
   );
 };
 
+const ButtonCustom = styled(Button)`
+  background-color: #a84a04;
+  border-color: #a84a04;
+`
 export default MyForm;
