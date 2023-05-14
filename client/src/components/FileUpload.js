@@ -85,7 +85,7 @@ const FileUpload = () => {
  
   
   const generate = async() => {
-    setMessage('We are processing all the data, your file will be ready in a few seconds ...')
+    setMessage('We are processing all the data, your file will be ready in a few seconds or minutes, depending on the data size ...')
     setLoading('start loading');
  
     //aqui quiero hacer un htttp post enviando el state dates que contiene el dato

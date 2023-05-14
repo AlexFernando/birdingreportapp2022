@@ -45,7 +45,8 @@ const UpdatePersonalData = () => {
           
                 setTimeout(() =>  setUploadedFile('uploaded'),3000);
               
-                setMessage('Your file has been Uploaded');          
+                setMessage('Your file has been Uploaded'); 
+                setTimeout(() =>  setMessage(''), 7000);         
               }
             }
           });
