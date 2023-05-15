@@ -109,7 +109,7 @@ const FileUpload = () => {
           setDates({});
         }, timeout);
       } else {
-        const timeout = 60000 + ((yearDiff - 2) * 30000);
+        const timeout = 80000 + ((yearDiff - 2) * 40000);
         setTimeout(() => {
           setLoading('')
           setMessage('Thanks for your patience, your report is ready. Click on Download Button.')

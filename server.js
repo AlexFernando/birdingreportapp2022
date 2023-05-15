@@ -90,13 +90,13 @@ app.post('/updatemaindata', (req, res) => {
   
   const file = req.files.file;
 
-  file.mv(`${__dirname}/updatesfiles/maindata/mainData.xlsx`, err => {
+  file.mv(`${__dirname}/client/src/files/maindata/mainData.xlsx`, err => {
       
       if (err) {
           console.error(err);
           return res.status(500).send(err)
       }
-      res.json({ fileName: file.name, filePath: `/updatesfiles/maindata/mainData.xlsx` });
+      res.json({ fileName: file.name, filePath: `/client/src/files/maindata/mainData.xlsx` });
   })
 });
 
@@ -109,13 +109,13 @@ app.post('/updaterestrictiondata', (req, res) => {
   
   const file = req.files.file;
 
-  file.mv(`${__dirname}/updatesfiles/restrictiondata/RestrictionData.xlsx`, err => {
+  file.mv(`${__dirname}/client/src/files/restrictiondata/RestrictionData.xlsx`, err => {
       
       if (err) {
           console.error(err);
           return res.status(500).send(err)
       }
-      res.json({ fileName: file.name, filePath: `/updatesfiles/restrictiondata/RestrictionData.xlsx` });
+      res.json({ fileName: file.name, filePath: `/client/src/files/restrictiondata/RestrictionData.xlsx` });
   })
 });
 
@@ -127,13 +127,13 @@ app.post('/updatepresencendata', (req, res) => {
   
   const file = req.files.file;
 
-  file.mv(`${__dirname}/updatesfiles/presencedata/presenceData.xlsx`, err => {
+  file.mv(`${__dirname}/client/src/files/presencedata/presenceData.xlsx`, err => {
       
       if (err) {
           console.error(err);
           return res.status(500).send(err)
       }
-      res.json({ fileName: file.name, filePath: `/updatesfiles/presencedata/presenceData.xlsx` });
+      res.json({ fileName: file.name, filePath: `/client/src/files/presencedata/presenceData.xlsx` });
   })
 });
 
@@ -145,13 +145,13 @@ app.post('/updateconservationdata', (req, res) => {
   
   const file = req.files.file;
 
-  file.mv(`${__dirname}/updatesfiles/conservationdata/conservationData.xlsx`, err => {
+  file.mv(`${__dirname}/client/src/files/conservationdata/conservationData.xlsx`, err => {
       
       if (err) {
           console.error(err);
           return res.status(500).send(err)
       }
-      res.json({ fileName: file.name, filePath: `/updatesfiles/conservationdata/conservationData.xlsx` });
+      res.json({ fileName: file.name, filePath: `/client/src/files/conservationdata/conservationData.xlsx` });
   })
 });
 
@@ -165,26 +165,6 @@ app.post('/dates', async (req, res) => {
   myDates["loading"] = '';
   res.json(myDates)
 })
-
-// app.post('/dates', async (req, res) => {
-//   const myDates = req.body.myDates;
-//   const filename = req.body.filename;
-
-//   try {
-//     const filteredData = await myLogic.mySpecialFunction(myDates.initialDate, myDates.endDate, filename);
-//     console.log("filteredData: ", filteredData)
-//     if(filteredData === 1) {
-//       myDates["loading"] = '';
-//       // Do something with the filtered data
-//       res.json(myDates);
-//     }
- 
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
-
 
 // write the stats docx.
 app.post('/writestats', (req, res) => {
