@@ -177,8 +177,9 @@ const FileUpload = () => {
     <input
       type='submit'
       value='Upload'
-      className='btn btn-primary btn-block mt-4'
-      style={{ backgroundColor: '#a84a04', borderColor: '#a84a04' }}
+      className='btn-block mt-4'
+      style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem 0' }}
+      target="_self"
     />
   </form> 
   }
@@ -217,7 +218,9 @@ if(isEmpty(dates)) {
 } else {
   datesBehavior = <div className="text-center">
     <img src={articuno} alt="articuno" />
-    <input onClick={generate} type='submit'value='Generate Report' className='btn btn-primary btn-block mt-4'/>
+    <input onClick={generate} type='submit'value='Generate Report' className='btn-block mt-4'
+        style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem 0' }} target="_self"
+    />
   </div>
 }
   
@@ -232,13 +235,13 @@ if(isEmpty(dates)) {
         {generatedFile ? <div className="text-center">
               <img src={zapdos} alt="zapdos" />
               <form onSubmit = {onSubmitDownload} >
-                <input type="submit" value="Download" className="btn btn-primary btn-block mt-4" target="_self"/>
+                <input type="submit" value="Download" className="btn-block mt-4" style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem 0' }}  target="_self"/>
               </form>
               </div>: null}
           {downloadedFile ? 
             <div className="text-center">
               <img src={moltres} alt="moltres" />
-              <input onClick={initialRender} type="button" value="Try Again" className="btn btn-primary btn-block mt-4" target="_self"/>
+              <input onClick={initialRender} type="button" value="Try Again" className="btn-block mt-4" style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem 0' }} target="_self"/>
             </div>: null
           }
       </Fragment>

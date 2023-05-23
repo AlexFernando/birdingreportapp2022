@@ -46,7 +46,7 @@ const DateForm = ({getDates}) => {
           </div>
       </div>  
 
-      <input type="submit" className='btn btn-primary btn-block mt-4' value="Submit" />    
+      <input type="submit" className='btn btn-primary btn-block mt-4'     style={{ backgroundColor: '#a84a04', borderColor: '#a84a04' }} value="Submit" />    
     </form>
     </div>
 

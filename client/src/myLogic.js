@@ -1018,6 +1018,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 
         let numIndex = 0;
         let countGroups = 0;
+
+        let myCount = 0
     
         for (key in objectFormat) {
             let familyName = key;
@@ -1033,6 +1035,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
     
             value = objectFormat[key];
+
     
             for (let elem = 0; elem < value.length; elem++) {
     
@@ -1206,6 +1209,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
    
                 if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group') && !value[elem]['category'].includes('form')) {
                     numIndex++;
+
+                    myCount++;
     
                     pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
                     
@@ -1319,6 +1324,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                     if(groupNoSpecies.includes(scientificName) || formNoSpecies.includes(scientificName) || commonName === 'Rock Pigeon (Feral Pigeon)') {
                         numIndex++;
+                        myCount++;
                         pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
                         pObj.addText(commonName.split(' ')[0] + ' ' + commonName.split(' ')[1] , { bold: true, font_face: 'Calibri', font_size: 12 })
                         pObj.addText(' (' + scientificName.split(' ')[0] + ' '+scientificName.split(' ')[1] + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
@@ -1439,7 +1445,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         }
 
-        console.log("Hola vamos a terminar el programa")
+        console.log("Hola vamos a terminar el programa: ", myCount)
     
         pObj1 = docx.createP()
         pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })

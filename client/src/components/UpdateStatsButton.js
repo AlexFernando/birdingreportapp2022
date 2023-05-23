@@ -29,9 +29,32 @@ function FileReadingComponent() {
   );
 }
 
-const ButtonCustom = styled(Button)`
+export const ButtonCustom = styled.button`
   background-color: #a84a04;
   border-color: #a84a04;
-`
+  color: #fff;
+  border-radius: .5rem;
+  padding: .5rem;
+
+  &:hover {
+    background-color: #c96d00;
+    border-color: #c96d00;
+    color: #fff;
+  }
+
+  &:active {
+    background-color: #914702;
+    border-color: #914702;
+    color: #fff;
+  }
+
+  &:disabled {
+    background-color: #a84a04;
+    border-color: #a84a04;
+    color: #777;
+    cursor: not-allowed;
+  }
+`;
+
 
 export default FileReadingComponent;

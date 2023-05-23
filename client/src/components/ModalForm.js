@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import styled from 'styled-components';
+import {ButtonCustom} from './UpdateStatsButton'
 const {findMatchingDates} = require('../helpers.js/MatchingDateRange');
 
 const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => {
@@ -262,8 +263,4 @@ const MyForm = ({speciesListAll, setSeasonSpeciesList, setSeasonSpeciesAcc}) => 
   );
 };
 
-const ButtonCustom = styled(Button)`
-  background-color: #a84a04;
-  border-color: #a84a04;
-`
 export default MyForm;

@@ -93,8 +93,8 @@ const UpdatePersonalData = () => {
                               <input
                                 type='submit'
                                 value='Upload'
-                                className='btn btn-primary mt-4'
-                                style={{ backgroundColor: '#a84a04', borderColor: '#a84a04' }}
+                                className='mt-4'
+                                style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.4rem', padding: '.5rem 1rem' }}
                               />
                             </div>
                           </form>

@@ -31,7 +31,7 @@ import customSyles from '../App.css'
 /**IMPORT REACT SELECT */
 
 
-const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
+const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#a84a04" />
 
 const animatedComponents = makeAnimated();
 
@@ -499,7 +499,8 @@ const AnimatedMulti = ({getSpecies}) => {
             key="niceFilter"
             id="dropdown-variants"
             title="Filter By"
-            className = {customSyles}
+            variant='custom'
+            style={{ backgroundColor: '#a84a04', borderColor: '#a84a04', color: '#fff' }}
         >
             <Dropdown.Item eventKey="1" onClick={() => handleFilterOptionClick('Audio Recorded')} >Audio Recorded</Dropdown.Item>
             <Dropdown.Item eventKey="2" onClick={() => handleFilterOptionClick('Heard Only')} >Heard Only</Dropdown.Item>

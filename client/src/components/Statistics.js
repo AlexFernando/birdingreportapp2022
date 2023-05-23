@@ -6,6 +6,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import {Button } from 'react-bootstrap';
+import {ButtonCustom} from './UpdateStatsButton'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
@@ -19,7 +20,7 @@ import UpdateStatsButton from './UpdateStatsButton'
 //In another component you need to get the array of audio recorded birds, filter that from obs.details, then you need to get the data  
 //(don't forget the code) required and build the link with the coe
 
-const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#007bff" />
+const check = <FontAwesomeIcon icon={faCheck} size="xs" color="#a84a04" />
 
 const StatisticsComponent = () => {
 
@@ -155,6 +156,8 @@ const StatisticsComponent = () => {
                     key="niceFilter"
                     id="dropdown-variants"
                     title="Order By"
+                    variant='custom'
+                    style={{ backgroundColor: '#a84a04', border: '#a84a04', color: '#fff' }}
                 >
                     <Dropdown.Item eventKey="1" onClick = {handleDescendingOrder} >Ascending Taxonomic Order</Dropdown.Item>
                     <Dropdown.Item eventKey="2" onClick = {handleAscendingOrder} >Descending Taxonomic Order</Dropdown.Item>
@@ -348,14 +351,18 @@ const StatisticsComponent = () => {
             {/**Download file */}
             {
                 speciesList.length > 0?    
-                    <input onClick={handleStateListForRequest} type='submit'value='Generate Report' className='btn btn-primary btn-block mt-4'/>
+                    <input onClick={handleStateListForRequest} type='submit'value='Generate Report'
+                        style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem', textAlign:'center' }}
+                    />
                 :null
             }
                 
             {
                 genereated ? <div className="text-center">
                 <form onSubmit = {onSubmitDownload} >
-                  <input type="submit" value="Download" className="btn btn-primary btn-block mt-4" target="_self"/>
+                  <input type="submit" value="Download" target="_self"
+                    style={{ backgroundColor: '#a84a04', border: '#a84a04', color:'#fff', borderRadius: '.5rem', padding: '.5rem' }}
+                  />
                 </form>
               </div> : null
             }
@@ -456,7 +463,3 @@ const ListItem = styled.li`
 
 `
 
-const ButtonCustom = styled(Button)`
-  background-color: #a84a04;
-  border-color: #a84a04;
-`
