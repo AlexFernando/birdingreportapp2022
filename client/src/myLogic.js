@@ -24,7 +24,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
     let excelPresenceCodes = require('./excelPresenceCode') // Presence Code
     let excelConservationCodes = require('./excelConservationCode')//Conservation Code
 
-    console.log("filename: ", filename)
+    // console.log("filename: ", filename)
 
     let filenameUploaded = filename; 
     
@@ -197,6 +197,9 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspLocationHeard = elem.Location;
                     elem.sspDateHeard = elem.Date;
                     elem.sspTimeHeard = elem.Time; 
+                    elem.Location = ''
+                    elem.Date = ''
+                    elem.Time = ''
                 }
 
                 else {
@@ -227,6 +230,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspLocationBoth = elem.Location;
                     elem.sspDateBoth = elem.Date;
                     elem.sspTimeBoth = elem.Time; 
+
+                    elem.Location = ''
+                    elem.Date = ''
+                    elem.Time = ''
                 }
 
                 else {
@@ -258,6 +265,10 @@ function mySpecialFunction(initialDate, endDate, filename) {
                     elem.sspLocation = elem.Location;
                     elem.sspDate = elem.Date;
                     elem.sspTime = elem.Time; 
+
+                    elem.Location = ''
+                    elem.Date = ''
+                    elem.Time = ''
                 }
                
                 return elem;
@@ -494,7 +505,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
                         countDuplicates++;
                     }
 
-                    else {
+                    else {'subspecies'
                         if(countDuplicates === 0) {
                             uniqueLocations[index] = elem + " (1) "
                         }
@@ -856,11 +867,24 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
         let arrOfGroups = []
         let arrForms = []
+        let arrDomestic = []
         let countForms = 0;
+        let countDomestic = 0
+
+        let countSpecies = 0;
+        let somethingElse = 0;
         
         // creating arr of groups and forms
         locationsSeenUpdated.map( elem => {
-                if(elem.category.includes("group")) {
+                if(elem.category.includes("species")) {
+                    countSpecies++
+                    // if(elem.category.includes("subspecies")){
+                    //     console.log(elem)
+                    // }
+            
+                }
+
+                else if(elem.category.includes("group")) {
                     countGroup++;
                     arrOfGroups.push(elem['Scientific Name'])
                 }
@@ -868,6 +892,15 @@ function mySpecialFunction(initialDate, endDate, filename) {
                 else if(elem.category.includes("form")) {
                     countForms++;
                     arrForms.push(elem['Scientific Name'])
+                }
+                
+                else if (elem.category.includes("domestic")) {
+                    countDomestic++
+                    arrDomestic.push(elem['Scientific Name'])
+                }
+
+                else {
+                    somethingElse++;
                 }
             }
         )
@@ -878,8 +911,6 @@ function mySpecialFunction(initialDate, endDate, filename) {
         let countFormMatch = 0;
         let groupNoSpecies = ["fake"];
         let formNoSpecies = ["fake"];
-
-
 
         let groupsSpecie = arrOfGroups.map(elemGroup => {
             let matchName = locationsSeenUpdated.find( elem => elemGroup.includes(elem['Scientific Name']) && elemGroup !== elem['Scientific Name'])
@@ -914,7 +945,11 @@ function mySpecialFunction(initialDate, endDate, filename) {
         
         formNoSpecies.shift()
 
+        // console.log("formNoSpecies: ", formNoSpecies)
 
+        // console.log("species: ", countSpecies, "group with specie: ", countGroup, "form with specie: ", countForms, "something else: ", somethingElse, "countDomestic: ", countDomestic )
+
+        // console.log("arr domestic: ", arrDomestic);
         // END
 
         let arrRestCodesAdded = locationsSeenUpdated.map( elem => {
@@ -1207,27 +1242,47 @@ function mySpecialFunction(initialDate, endDate, filename) {
             else {
 
    
-                if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group') && !value[elem]['category'].includes('form')) {
-                    numIndex++;
-
-                    myCount++;
-    
-                    pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+                if (value[elem]['category'].includes('species') && !value[elem]['category'].includes('group') && !value[elem]['category'].includes('form') && !value[elem]['category'].includes('domestic') && !value[elem]['category'].includes('hybrid') && !value[elem]['category'].includes('intergrade') && !value[elem]['category'].includes('slash') && !value[elem]['category'].includes('spuh') && value[elem]['category'] !== '') {
                     
-                    pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
-                    pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
-                
-                    //adding codes 
-                        conservationCodeFunction()
-                        presenceCodeFunc();
-                        restricctionCodeFunc();
+                    if(scientificName === 'Psophia crepitans') {
+                        pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+                        pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+                    
+                        //adding codes 
+                            conservationCodeFunction()
+                            presenceCodeFunc();
+                            restricctionCodeFunc();
+                            
+     
+                        pObj.addLineBreak()                                               
+                        pObj.addLineBreak()
                         
- 
-                    pObj.addLineBreak()                                               
-                    pObj.addLineBreak()
+                        locationsFunc();
                     
-                    // locations func()
-                    locationsFunc();
+                    }
+
+                    else {
+                        numIndex++;
+
+                        myCount++;
+        
+                        pObj.addText(numIndex + '. ', { bold: true, font_face: 'Calibri', font_size: 12 })
+                        
+                        pObj.addText(commonName, { bold: true, font_face: 'Calibri', font_size: 12 })
+                        pObj.addText(' (' + scientificName + ')', { bold: true, font_face: 'Calibri', font_size: 12 })
+                    
+                        //adding codes 
+                            conservationCodeFunction()
+                            presenceCodeFunc();
+                            restricctionCodeFunc();
+                            
+     
+                        pObj.addLineBreak()                                               
+                        pObj.addLineBreak()
+                        
+                        locationsFunc();
+                    
+                
 
                     if( subSpecieName !== '') {
 
@@ -1312,6 +1367,8 @@ function mySpecialFunction(initialDate, endDate, filename) {
 
                         pObj.addLineBreak()
                         pObj.addLineBreak()
+
+                    }
 
                     }
 
@@ -1445,7 +1502,7 @@ function mySpecialFunction(initialDate, endDate, filename) {
             }
         }
 
-        console.log("Hola vamos a terminar el programa: ", myCount)
+        console.log("Hola vamos a terminar el programa: ")
     
         pObj1 = docx.createP()
         pObj1.addText('ANEXO', {bold: true, color: '188c18', font_face: 'Calibri', font_size: 16 })
